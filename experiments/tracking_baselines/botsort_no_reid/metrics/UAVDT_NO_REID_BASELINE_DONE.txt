@@ -1,0 +1,6 @@
+Completed: 2026-07-17T17:16:12+03:00
+Sequences: 20
+Raw result directory: experiments/tracking_baselines/botsort_no_reid/uavdt
+Filtered result directory: experiments/tracking_baselines/botsort_no_reid/uavdt_official
+TrackEval log: experiments/tracking_baselines/botsort_no_reid/metrics/uavdt_official_test.log
+Combined metrics: experiments/tracking_baselines/botsort_no_reid/metrics/uavdt_official_combined.txt
