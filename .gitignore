@@ -35,3 +35,6 @@ experiments/results/*
 # System files
 .DS_Store
 Thumbs.db
+
+# Detector training outputs
+experiments/detector_runs/
