@@ -1,0 +1,29 @@
+diff --git a/fast_reid/fastreid/data/build.py b/fast_reid/fastreid/data/build.py
+index 2c29d25..31f168a 100644
+--- a/fast_reid/fastreid/data/build.py
++++ b/fast_reid/fastreid/data/build.py
+@@ -8,8 +8,8 @@ import logging
+ import os
+ 
+ import torch
+-from torch._six import string_classes
+-from collections import Mapping
++string_classes = (str,)
++from collections.abc import Mapping
+ 
+ from fast_reid.fastreid.config import configurable
+ from fast_reid.fastreid.utils import comm
+diff --git a/fast_reid/fastreid/evaluation/testing.py b/fast_reid/fastreid/evaluation/testing.py
+index cf4abc3..5fe82c9 100644
+--- a/fast_reid/fastreid/evaluation/testing.py
++++ b/fast_reid/fastreid/evaluation/testing.py
+@@ -2,7 +2,8 @@
+ import logging
+ import pprint
+ import sys
+-from collections import Mapping, OrderedDict
++from collections import OrderedDict
++from collections.abc import Mapping
+ 
+ import numpy as np
+ from tabulate import tabulate
