@@ -4,3 +4,6 @@
 [submodule "baselines/YOLOX"]
 	path = baselines/YOLOX
 	url = https://github.com/Megvii-BaseDetection/YOLOX.git
+[submodule "baselines/TrackEval"]
+	path = baselines/TrackEval
+	url = https://github.com/JonathonLuiten/TrackEval.git
