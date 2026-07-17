@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# Datasets and generated results
+datasets/*
+!datasets/.gitkeep
+
+experiments/results/*
+!experiments/results/.gitkeep
+
+# Models
+*.pt
+*.pth
+*.onnx
+*.engine
+
+# Media
+*.mp4
+*.avi
+*.mov
+
+# System files
+.DS_Store
+Thumbs.db

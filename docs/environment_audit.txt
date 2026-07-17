@@ -1,0 +1,32 @@
+VERA-MOT ENVIRONMENT AUDIT
+Date: 2026-07-17T11:37:51+03:00
+
+=== OPERATING SYSTEM ===
+PRETTY_NAME="Ubuntu 22.04.5 LTS"
+NAME="Ubuntu"
+VERSION_ID="22.04"
+VERSION="22.04.5 LTS (Jammy Jellyfish)"
+VERSION_CODENAME=jammy
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=jammy
+
+=== KERNEL ===
+Linux nadiotisWorkstation 6.8.0-134-generic #134~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Tue Jun 30 14:05:04 UTC  x86_64 x86_64 x86_64 GNU/Linux
+
+=== PYTHON ===
+Python 3.10.12
+/usr/bin/python3
+
+=== GIT ===
+git version 2.34.1
+
+=== NVIDIA DRIVER / GPU ===
+
+=== CUDA TOOLKIT ===
+
+=== CONDA ===

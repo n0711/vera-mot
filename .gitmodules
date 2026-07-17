@@ -1,0 +1,3 @@
+[submodule "baselines/BoT-SORT"]
+	path = baselines/BoT-SORT
+	url = https://github.com/NirAharon/BoT-SORT.git
