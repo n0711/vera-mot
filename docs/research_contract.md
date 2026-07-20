@@ -1,65 +1,41 @@
-cat > docs/research_contract.md <<'EOF'
 # VERA-MOT Research Contract
 
-## Method
+## Method and research question
 
-VERA: Visual Embedding Reliability Assessment.
+VERA means Visual Embedding Reliability Assessment. The thesis asks whether a
+lightweight reliability assessment can prevent blurred, occluded, undersized,
+or otherwise unreliable UAV vehicle embeddings from corrupting association and
+long-term identity memory without unacceptable runtime overhead.
 
-## Thesis problem
+## Controlled progression
 
-Appearance embeddings extracted from aerial vehicle crops may become
-unreliable because of blur, occlusion, small target size, illumination
-change and UAV camera motion.
+1. UAVDT vehicle detector
+2. ByteTrack comparator
+3. BoT-SORT without ReID
+4. BoT-SORT with vehicle ReID
+5. VERA reliability-gated association
+6. VERA protected identity-memory updates
+7. Ablations and evaluation
+8. Edge/ROS 2 demonstration, later
 
-Using these corrupted embeddings can:
+BoT-SORT-ReID is the eventual direct baseline for VERA. The currently frozen
+milestone is the preceding BoT-SORT no-ReID baseline.
 
-1. produce incorrect detection-to-track associations;
-2. contaminate long-term identity memory;
-3. cause incorrect reactivation after occlusion;
-4. increase identity switches and track fragmentation.
+## Included
 
-## Research question
-
-Can lightweight visual-embedding reliability assessment reduce identity
-switches and improve target recovery in UAV video without introducing
-significant onboard computational overhead?
-
-## Baseline
-
-BoT-SORT-ReID.
-
-## Comparator
-
-ByteTrack.
-
-## Proposed contribution
-
-VERA will estimate the reliability of every candidate ReID embedding
-before it is allowed to:
-
-- influence association;
-- update identity memory;
-- reactivate a lost track.
-
-## Thesis scope
-
-Included:
-
-- baseline reproduction;
-- UAV dataset adaptation;
+- public UAV vehicle datasets and baseline reproduction;
+- vehicle appearance adaptation;
 - embedding reliability assessment;
-- reliability-weighted association;
-- protected identity memory;
-- ablation experiments;
-- tracking metrics;
-- onboard latency and resource profiling.
+- reliability-weighted association and protected identity memory;
+- ablations, tracking metrics, and onboard latency/resource profiling.
 
-Excluded from the thesis core:
+## Excluded from the thesis core
 
-- single-object tracking;
-- heading estimation;
-- gimbal control;
-- MAVLink commands;
-- UAV following control;
-- real closed-loop flight testing.
-EOF
+- single-object tracking and heading estimation;
+- gimbal or flight control;
+- MAVLink command authority;
+- autonomous following and real closed-loop flight testing;
+- the complete ADDITESS guidance pipeline.
+
+Claims of recovery or identity retention require annotated identity evidence.
+Qualitative private-video observations are not benchmark results.

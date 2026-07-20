@@ -26,6 +26,50 @@ OUTPUT_ROOT = (
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 
 
+def parse_yolo_annotation(
+    line: str,
+    width: int,
+    height: int,
+    *,
+    source: str = "<annotation>",
+) -> dict:
+    """Convert one YOLO row to the single frozen COCO vehicle category."""
+    parts = line.split()
+    if len(parts) != 5:
+        raise ValueError(f"{source}: expected 5 values, found {len(parts)}")
+
+    class_id, x_center, y_center, box_width, box_height = map(float, parts)
+    source_class_id = int(class_id)
+    if source_class_id < 0:
+        raise ValueError(f"{source}: invalid class {class_id}")
+
+    values = (x_center, y_center, box_width, box_height)
+    if not all(0.0 <= value <= 1.0 for value in values):
+        raise ValueError(f"{source}: coordinates outside [0, 1]")
+
+    pixel_width = box_width * width
+    pixel_height = box_height * height
+    x_min = max(0.0, (x_center * width) - (pixel_width / 2.0))
+    y_min = max(0.0, (y_center * height) - (pixel_height / 2.0))
+    pixel_width = min(pixel_width, width - x_min)
+    pixel_height = min(pixel_height, height - y_min)
+    if pixel_width <= 0 or pixel_height <= 0:
+        raise ValueError(f"{source}: invalid box")
+
+    return {
+        "category_id": 1,
+        "source_class_id": source_class_id,
+        "bbox": [
+            round(x_min, 3),
+            round(y_min, 3),
+            round(pixel_width, 3),
+            round(pixel_height, 3),
+        ],
+        "area": round(pixel_width * pixel_height, 3),
+        "iscrowd": 0,
+    }
+
+
 def convert_split(source_split: str, coco_split: str) -> None:
     image_source = SOURCE_ROOT / source_split / "images"
     label_source = SOURCE_ROOT / source_split / "labels"
@@ -76,72 +120,14 @@ def convert_split(source_split: str, coco_split: str) -> None:
                 if not line.strip():
                     continue
 
-                parts = line.split()
-
-                if len(parts) != 5:
-                    raise ValueError(
-                        f"{label_path}:{line_number}: "
-                        f"expected 5 values, found {len(parts)}"
-                    )
-
-                class_id, x_center, y_center, box_width, box_height = (
-                    map(float, parts)
+                annotation = parse_yolo_annotation(
+                    line,
+                    width,
+                    height,
+                    source=f"{label_path}:{line_number}",
                 )
-
-                source_class_id = int(class_id)
-
-                if source_class_id < 0:
-                    raise ValueError(
-                        f"{label_path}:{line_number}: "
-                        f"invalid class {class_id}"
-                    )
-
-                values = (
-                    x_center,
-                    y_center,
-                    box_width,
-                    box_height,
-                )
-
-                if not all(0.0 <= value <= 1.0 for value in values):
-                    raise ValueError(
-                        f"{label_path}:{line_number}: "
-                        f"coordinates outside [0, 1]"
-                    )
-
-                pixel_width = box_width * width
-                pixel_height = box_height * height
-
-                x_min = (x_center * width) - (pixel_width / 2.0)
-                y_min = (y_center * height) - (pixel_height / 2.0)
-
-                x_min = max(0.0, x_min)
-                y_min = max(0.0, y_min)
-
-                pixel_width = min(pixel_width, width - x_min)
-                pixel_height = min(pixel_height, height - y_min)
-
-                if pixel_width <= 0 or pixel_height <= 0:
-                    raise ValueError(
-                        f"{label_path}:{line_number}: invalid box"
-                    )
-
-                annotations.append(
-                    {
-                        "id": annotation_id,
-                        "image_id": image_id,
-                        "category_id": 1,
-                        "source_class_id": source_class_id,
-                        "bbox": [
-                            round(x_min, 3),
-                            round(y_min, 3),
-                            round(pixel_width, 3),
-                            round(pixel_height, 3),
-                        ],
-                        "area": round(pixel_width * pixel_height, 3),
-                        "iscrowd": 0,
-                    }
-                )
+                annotation.update({"id": annotation_id, "image_id": image_id})
+                annotations.append(annotation)
 
                 annotation_id += 1
 

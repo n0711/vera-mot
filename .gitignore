@@ -38,3 +38,29 @@ Thumbs.db
 
 # Detector training outputs
 experiments/detector_runs/
+
+# Generated detector evaluation; retain only the canonical compact summary.
+experiments/detector_evaluation/**
+!experiments/detector_evaluation/
+!experiments/detector_evaluation/uavdt_test_summary.txt
+
+# Generated no-ReID artifacts; retain manifests and compact metric evidence.
+experiments/tracking_baselines/botsort_no_reid/finish.log
+experiments/tracking_baselines/botsort_no_reid/logs/
+experiments/tracking_baselines/botsort_no_reid/uavdt/
+experiments/tracking_baselines/botsort_no_reid/uavdt_official/
+experiments/tracking_baselines/botsort_no_reid/*.mp4
+experiments/tracking_baselines/botsort_no_reid/*.txt
+experiments/tracking_baselines/botsort_no_reid/metrics/**
+!experiments/tracking_baselines/botsort_no_reid/metrics/
+!experiments/tracking_baselines/botsort_no_reid/metrics/UAVDT_NO_REID_BASELINE_DONE.txt
+!experiments/tracking_baselines/botsort_no_reid/metrics/uavdt_official_combined.txt
+!experiments/tracking_baselines/botsort_no_reid/metrics/uavdt_official/
+!experiments/tracking_baselines/botsort_no_reid/metrics/uavdt_official/botsort_no_reid/
+!experiments/tracking_baselines/botsort_no_reid/metrics/uavdt_official/botsort_no_reid/all_test/
+!experiments/tracking_baselines/botsort_no_reid/metrics/uavdt_official/botsort_no_reid/all_test/pedestrian_summary.txt
+!experiments/tracking_baselines/botsort_no_reid/metrics/uavdt_official/botsort_no_reid/all_test/pedestrian_detailed.csv
+
+# Local/generated inspection notes.
+docs/botsort_interface_audit.txt
+docs/uavdt_structure_audit.txt

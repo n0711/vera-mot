@@ -1,0 +1,27 @@
+VERA-MOT YOLOX-S UAVDT HELD-OUT TEST SUMMARY
+Completed: 2026-07-17 15:17:47 +03:00
+Images: 272
+Classes: 1 (vehicle)
+Configuration: configs/yolox_uavdt_s_1280_test.py
+Checkpoint: experiments/detector_runs/yolox_uavdt_s_1280/best_ckpt.pth
+Checkpoint SHA-256: 91b8c13682a3b74cdd74d45edc83899cfb8be367665f85c942c761a78189ceef
+Input: 1280x1280
+Precision mode: FP16
+
+COCO AP @[IoU=0.50:0.95]: 0.50132
+COCO AP50: 0.835
+COCO AP75: 0.561
+COCO AP small: 0.328
+COCO AP medium: 0.578
+COCO AP large: 0.687
+COCO AR100: 0.55305
+COCO AR100 small: 0.363
+COCO AR100 medium: 0.642
+COCO AR100 large: 0.720
+
+Average forward time: 13.23 ms
+Average NMS time: 1.09 ms
+Average inference time: 14.32 ms
+
+Source evidence: local untracked experiments/detector_evaluation/uavdt_test_metrics.txt
+Metric precision note: per-class AP/AR values retain additional displayed digits.

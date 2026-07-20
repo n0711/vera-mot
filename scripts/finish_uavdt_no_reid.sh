@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
 set -eEo pipefail
 
-PROJECT_ROOT="${PROJECT_ROOT:-$HOME/Projects/vera-mot}"
+PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 cd "$PROJECT_ROOT"
+
+FORCE=0
+if [[ "${1:-}" == "--force" ]]; then
+  FORCE=1
+  shift
+fi
+if [[ "$#" -ne 0 ]]; then
+  echo "Usage: $0 [--force]" >&2
+  exit 2
+fi
 
 if [[ ! -f .venv/bin/activate ]]; then
   echo "Missing virtual environment: $PROJECT_ROOT/.venv" >&2
@@ -28,9 +38,18 @@ SEQUENCES=(
 for sequence in "${SEQUENCES[@]}"; do
   result_file="$RESULT_ROOT/${sequence}.txt"
 
-  if [[ -s "$result_file" ]]; then
-    echo "[SKIP] $sequence already has a non-empty result file"
-    continue
+  if [[ -e "$result_file" ]]; then
+    if python scripts/baseline_artifacts.py verify-result \
+      --sequence "$sequence" --result "$result_file"; then
+      echo "[REUSE] $sequence has verified configuration and content fingerprints"
+      continue
+    fi
+    if [[ "$FORCE" -ne 1 ]]; then
+      echo "Refusing to reuse or overwrite incompatible result: $result_file" >&2
+      echo "Inspect it, or rerun explicitly with --force. No result was deleted." >&2
+      exit 1
+    fi
+    echo "[FORCE] Replacing $sequence only after explicit user request"
   fi
 
   echo
@@ -38,6 +57,10 @@ for sequence in "${SEQUENCES[@]}"; do
   python scripts/run_uavdt_botsort_sequence.py \
     --sequence "$sequence" \
     --fp16
+
+  python scripts/baseline_artifacts.py record-result \
+    --sequence "$sequence" \
+    --result "$result_file"
 
 done
 

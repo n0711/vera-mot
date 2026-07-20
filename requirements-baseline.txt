@@ -1,0 +1,27 @@
+# Portable focused environment for the frozen detector/tracker baseline.
+# Python 3.10.12 was used. Install torch/torchvision separately using the
+# official wheel index matching the host CUDA runtime:
+#   torch==2.4.1+cu124
+#   torchvision==0.19.1+cu124
+Cython==0.29.37
+cython-bbox==0.1.5
+easydict==1.13
+filterpy==1.4.5
+lap==0.5.13
+loguru==0.7.3
+matplotlib==3.10.9
+motmetrics==1.4.0
+numpy==1.26.4
+opencv-python==4.11.0.86
+pandas==2.3.3
+Pillow==12.2.0
+pycocotools==2.0.11
+PyYAML==6.0.3
+scikit-image==0.25.2
+scikit-learn==1.7.2
+scipy==1.15.3
+tabulate==0.10.0
+tensorboard==2.21.0
+thop==0.1.1.post2209072238
+tqdm==4.68.4
+yacs==0.1.8

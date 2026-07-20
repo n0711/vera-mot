@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "experiment": {
+    "name": "botsort_no_reid",
+    "milestone": "3.1",
+    "status": "frozen_executed_baseline",
+    "completed_at": "2026-07-17T17:16:12+03:00"
+  },
+  "source": {
+    "superproject_revision_at_execution": "1c701ca7c15ea5ec127ce546e7c7b870404640f9",
+    "submodules": {
+      "BoT-SORT": "251985436d6712aaf682aaaf5f71edb4987224bd",
+      "YOLOX": "6ddff4824372906469a7fae2dc3206c7aa4bbaee",
+      "TrackEval": "12c8791b303e0a0b50f753af204249e622d0281a"
+    },
+    "compatibility_patch": {
+      "path": "patches/botsort-python310-pytorch24.patch",
+      "sha256": "3e4a6b1f119cd98973a4cb3b731e19d1d0aad5014f1f3096494d92ab962e2ca8"
+    }
+  },
+  "frozen_configuration": {
+    "detector": {
+      "model": "YOLOX-S",
+      "classes": ["vehicle"],
+      "num_classes": 1,
+      "config": "configs/yolox_uavdt_s_1280_test.py",
+      "checkpoint": "experiments/detector_runs/yolox_uavdt_s_1280/best_ckpt.pth",
+      "checkpoint_sha256": "91b8c13682a3b74cdd74d45edc83899cfb8be367665f85c942c761a78189ceef",
+      "input_size": [1280, 1280],
+      "confidence": 0.05,
+      "nms": 0.65,
+      "class_agnostic_nms": true,
+      "precision": "FP16 when CUDA is available"
+    },
+    "tracker": {
+      "implementation": "BoT-SORT",
+      "track_high_threshold": 0.35,
+      "track_low_threshold": 0.1,
+      "new_track_threshold": 0.45,
+      "match_threshold": 0.8,
+      "second_stage_threshold": 0.5,
+      "track_buffer": 30,
+      "assumed_fps": 30,
+      "minimum_box_area": 0.0,
+      "camera_motion_compensation": "sparseOptFlow",
+      "proximity_threshold_inactive": 0.5,
+      "appearance_threshold_inactive": 0.25,
+      "reid_enabled": false,
+      "reid_checkpoint": null
+    },
+    "dataset": {
+      "name": "UAVDT",
+      "split": "official MOT test split",
+      "sequences": [
+        "M0203", "M0205", "M0208", "M0209", "M0403",
+        "M0601", "M0602", "M0606", "M0701", "M0801",
+        "M0802", "M1001", "M1004", "M1007", "M1009",
+        "M1101", "M1301", "M1302", "M1303", "M1401"
+      ]
+    },
+    "filtering": {
+      "valid_ground_truth_match_iou": 0.5,
+      "unmatched_tracker_ignore_ioa": 0.5
+    },
+    "evaluation": {
+      "tool": "TrackEval MotChallenge2DBox adapter",
+      "metrics": ["HOTA", "CLEAR", "Identity"],
+      "threshold": 0.5,
+      "do_preprocessing": false
+    }
+  },
+  "results": {
+    "sequence_count": 20,
+    "failed_sequences": 0,
+    "skipped_sequences_in_evaluation": 0,
+    "metrics_percent": {
+      "HOTA": 43.340,
+      "DetA": 36.441,
+      "AssA": 52.419,
+      "IDF1": 56.964,
+      "MOTA": 31.265,
+      "MOTP": 74.136,
+      "precision": 67.048,
+      "recall": 62.161
+    },
+    "identity_switches": 1180,
+    "fragmentations": 3738
+  },
+  "paths": {
+    "frames": "datasets/UAVDT/full_mot/raw/UAV-benchmark-M/{sequence}/img*.jpg",
+    "ground_truth": "datasets/UAVDT/full_mot/toolkit/UAV-benchmark-MOTD_v1.0/GT",
+    "raw_results": "experiments/tracking_baselines/botsort_no_reid/uavdt/{sequence}.txt",
+    "filtered_results": "experiments/tracking_baselines/botsort_no_reid/uavdt_official/{sequence}.txt",
+    "canonical_metrics": "experiments/tracking_baselines/botsort_no_reid/metrics/uavdt_official_combined.txt"
+  },
+  "environment": {
+    "os": "Ubuntu 22.04.5 LTS",
+    "python": "3.10.12",
+    "pytorch": "2.4.1+cu124",
+    "torchvision": "0.19.1+cu124",
+    "numpy": "1.26.4",
+    "opencv_python": "4.11.0.86",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU, 8188 MiB",
+    "driver": "595.71.05",
+    "runtime_fps": {
+      "recorded_sequence_count": 19,
+      "minimum": 34.51,
+      "mean_unweighted": 37.69,
+      "maximum": 41.70,
+      "missing": ["M0203"],
+      "note": "End-to-end detector plus tracker timing; excludes TrackEval and rendering."
+    }
+  },
+  "missing_provenance": [
+    "UAVDT archive source URL and archive checksum",
+    "derivation and provenance of the 1266/271/272 detection split",
+    "public distribution location for the trained detector checkpoint",
+    "initial COCO YOLOX-S checkpoint URL and checksum",
+    "M0203 runtime for the frozen run"
+  ],
+  "limitations": [
+    "Datasets and weights are not distributed in this repository.",
+    "Custom UAVDT ignore filtering has not been regression-tested against the official MATLAB evaluator.",
+    "The TrackEval adapter uses the nominal class label pedestrian for the single vehicle class.",
+    "Qualitative private-video observations are not benchmark evidence."
+  ]
+}

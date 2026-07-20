@@ -1,0 +1,25 @@
+{
+  "configuration_fingerprint": "ade591206c83c8744e563e888ffc6606e875189b0b594cc6f939bd0732634f5a",
+  "results": {
+    "M0203": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M0203.txt", "sha256": "4eb6b7370bf7d8caa2ef396d370c2d2243a5d4527837a71eec5369e99fe633bf"},
+    "M0205": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M0205.txt", "sha256": "84c6c1e5f1f79e39b3db25dfb07cdbacdc7240f8459ef06981a1ce09f8742362"},
+    "M0208": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M0208.txt", "sha256": "23045bf48da3f95327fde3cbaaf76a2f3c152a571cf56dab074b79d53f0fd76e"},
+    "M0209": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M0209.txt", "sha256": "af9784afec433052798ee8df2860d20e2a6f84868cd0303aad946d8a2bee1b92"},
+    "M0403": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M0403.txt", "sha256": "04c2dd4ab0e4815bf5d065a33ebeafff67edade42860f2fd83272d04fb31ed1a"},
+    "M0601": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M0601.txt", "sha256": "2677b1ab0f193169aa005c52dd7c281921e495983a2a218cbf69cd099045bd69"},
+    "M0602": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M0602.txt", "sha256": "365dcd09ce2e5f5dad6d209c1eabbabe2a7acc8824b09fc22219ef7b2f1ebb0f"},
+    "M0606": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M0606.txt", "sha256": "49eeec46255f0c845549accd91ff39fbef9ede749b1bc13de5392430da4c573d"},
+    "M0701": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M0701.txt", "sha256": "3af69408deaf6851ee0607a113fc7859309056894da1aec73d5b46bf9d066773"},
+    "M0801": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M0801.txt", "sha256": "3df217205104bfdba8b7677c00b611628ee4ab16b0d089960e42010824360090"},
+    "M0802": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M0802.txt", "sha256": "40c40520de9015dc8636b2dd10f90bde70607ffdbf2b198f65de1ca4e4fcae22"},
+    "M1001": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M1001.txt", "sha256": "9091162d79f400d1e8f27c1d4c506c0de3c89cfc8cff2e511e06c3411a6d513f"},
+    "M1004": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M1004.txt", "sha256": "38a505e10b15e7aa063e83c5bc74cd519c29d2612cd9742f7e2f04f481cb4e98"},
+    "M1007": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M1007.txt", "sha256": "01f874a3411c381c863e4abed00d8c996d601c0838b7830122877d38abd80a4f"},
+    "M1009": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M1009.txt", "sha256": "4023bca62ecab71e781cd25ce164de5bb04314b0a229e750a3300602476383d1"},
+    "M1101": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M1101.txt", "sha256": "ea45272ce67dc40259c430c26651ff16adc819cdce6def2fca767ea2665038ce"},
+    "M1301": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M1301.txt", "sha256": "2fa9987c6c5db34dff74d471aba8c03d1b3da1d53c9093a9009e80ff8d3674e4"},
+    "M1302": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M1302.txt", "sha256": "5e2d6102153c1f5eed31e136c0196b123c0b461707aa346c98193722f0064a8d"},
+    "M1303": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M1303.txt", "sha256": "1fbc4db9190c5738b32af2b70f47d837016c08f0668827a1760694578c8bfab6"},
+    "M1401": {"path": "experiments/tracking_baselines/botsort_no_reid/uavdt/M1401.txt", "sha256": "a8367319a434610a448729a83ae4714b1dfcc7b229603eda844d14988d870ac6"}
+  }
+}
