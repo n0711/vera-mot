@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "selection_method": "deterministic_exhaustive_representative_holdout",
+  "seed": 42,
+  "selection_evidence": {
+    "authoritative_pool": "The 30 sequences in datasets/UAVDT/full_mot/attributes/M_attr/train and docs/uavdt_mot_audit.json.",
+    "official_attributes": "Ten binary columns documented by M_attr/readme.txt: daylight, night, fog; low, medium, high altitude; front, side, bird view; long-term.",
+    "annotation_statistics": [
+      "vehicle observations per frame", "category 1/2/3 proportions",
+      "box width/height/area medians", "raw occlusion code proportions",
+      "raw out-of-view code proportions", "composite identity count",
+      "observation count", "observations per identity"
+    ],
+    "algorithm": "Enumerate all 6-sequence subsets that cover every official attribute present in the pool. Choose the subset with minimum mean absolute standardized deviation between its feature means and the complete 30-sequence pool; lexical sequence order breaks exact score ties.",
+    "winning_score": 0.134494,
+    "validation_attribute_counts": {
+      "daylight": 3, "night": 2, "fog": 1,
+      "low_altitude": 2, "medium_altitude": 3, "high_altitude": 1,
+      "front_view": 4, "side_view": 3, "bird_view": 1, "long_term": 1
+    },
+    "camera_motion_note": "No separate camera-motion attribute is documented in the authoritative local M_attr README; no meaning is inferred.",
+    "raw_code_note": "Category, occlusion and out-of-view numeric codes remain raw; no undocumented meanings are inferred.",
+    "rejected_method": "The last six lexically sorted sequences split is rejected as arbitrary and non-representative."
+  },
+  "train_sequences": [
+    "M0101", "M0204", "M0206", "M0207", "M0210", "M0301",
+    "M0401", "M0402", "M0604", "M0605", "M0702", "M0703",
+    "M0704", "M0901", "M0902", "M1003", "M1005", "M1006",
+    "M1008", "M1102", "M1201", "M1202", "M1304", "M1305"
+  ],
+  "validation_sequences": ["M0201", "M0202", "M0501", "M0603", "M1002", "M1306"],
+  "frozen_test_sequences": [
+    "M0203", "M0205", "M0208", "M0209", "M0403", "M0601", "M0602",
+    "M0606", "M0701", "M0801", "M0802", "M1001", "M1004", "M1007",
+    "M1009", "M1101", "M1301", "M1302", "M1303", "M1401"
+  ],
+  "manifest_policy": {
+    "seed": 42,
+    "categories": [1, 2, 3],
+    "identity": "<sequence>_<target_id>",
+    "minimum_valid_observations_per_identity": 10,
+    "temporal_stride": 5,
+    "maximum_samples_per_identity": 200,
+    "minimum_final_planned_crops_per_identity": 4,
+    "minimum_clipped_width": 10,
+    "minimum_clipped_height": 10,
+    "minimum_clipped_area": 100,
+    "source_gt_pattern": "*_gt_whole.txt",
+    "creates_crops": false
+  }
+}

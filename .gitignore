@@ -17,6 +17,12 @@ env/
 # Datasets and generated results
 datasets/*
 !datasets/.gitkeep
+datasets/UAVDT/reid_manifests/
+datasets/UAVDT/reid_crops/
+experiments/reid_data/*.csv
+experiments/reid_data/crops/
+experiments/reid_data/qa/
+experiments/reid_training/
 
 experiments/results/*
 !experiments/results/.gitkeep

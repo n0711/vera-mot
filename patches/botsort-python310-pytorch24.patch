@@ -27,3 +27,40 @@ index cf4abc3..5fe82c9 100644
 
  import numpy as np
  from tabulate import tabulate
+diff --git a/fast_reid/fastreid/engine/train_loop.py b/fast_reid/fastreid/engine/train_loop.py
+--- a/fast_reid/fastreid/engine/train_loop.py
++++ b/fast_reid/fastreid/engine/train_loop.py
+@@ -248,7 +248,9 @@ class SimpleTrainer(TrainerBase):
+         If you need accumulate gradients or something similar, you can
+         wrap the optimizer with your custom `zero_grad()` method.
+         """
+-        self.optimizer.zero_grad()
++        # ContiguousParams requires its gradient-buffer reference to survive
++        # zeroing; PyTorch 2.x defaults set_to_none=True.
++        self.optimizer.zero_grad(set_to_none=False)
+ 
+         losses.backward()
+ 
+@@ -346,7 +346,9 @@ class AMPTrainer(SimpleTrainer):
+             loss_dict = self.model(data)
+             losses = sum(loss_dict.values())
+ 
+-        self.optimizer.zero_grad()
++        # ContiguousParams requires its gradient-buffer reference to survive
++        # zeroing; PyTorch 2.x defaults set_to_none=True.
++        self.optimizer.zero_grad(set_to_none=False)
+         self.grad_scaler.scale(losses).backward()
+ 
+         self._write_metrics(loss_dict, data_time)
+diff --git a/fast_reid/fastreid/engine/hooks.py b/fast_reid/fastreid/engine/hooks.py
+--- a/fast_reid/fastreid/engine/hooks.py
++++ b/fast_reid/fastreid/engine/hooks.py
+@@ -198,7 +198,7 @@ class PeriodicCheckpointer(_PeriodicCheckpointer, HookBase):
+ 
+     def before_train(self):
+         self.max_epoch = self.trainer.max_epoch
+-        if len(self.trainer.cfg.DATASETS.TESTS) == 1:
++        if len(self.trainer.cfg.DATASETS.TESTS) <= 1:
+             self.metric_name = "metric"
+         else:
+             self.metric_name = self.trainer.cfg.DATASETS.TESTS[0] + "/metric"

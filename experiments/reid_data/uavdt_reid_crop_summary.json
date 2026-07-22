@@ -1,0 +1,565 @@
+{
+  "category_conflicts": {
+    "train": {
+      "category_combinations": {
+        "1+2": 13,
+        "1+3": 3
+      },
+      "category_transitions": 16,
+      "identities_with_multiple_raw_categories": 16,
+      "majority_category_distribution": {
+        "1": 968,
+        "2": 59,
+        "3": 21
+      },
+      "percentage_of_accepted_identities": 1.5267,
+      "same_frame_category_conflicts": 0
+    },
+    "val": {
+      "category_combinations": {
+        "1+2": 1,
+        "1+3": 1
+      },
+      "category_transitions": 2,
+      "identities_with_multiple_raw_categories": 2,
+      "majority_category_distribution": {
+        "1": 249,
+        "2": 7,
+        "3": 8
+      },
+      "percentage_of_accepted_identities": 0.7576,
+      "same_frame_category_conflicts": 0
+    }
+  },
+  "code_and_dirty_state_note": "Generated from working-tree code; repository was dirty.",
+  "crop_registry_checksums": {
+    "train": "b89819789c4782f19ce132b81a114770554ee7e34e17b772cc56af05e5a515c5",
+    "val": "7f0c824103d5e2915ffb4f644dbe3bb6bf4f89026e10e9cdfef9df5c999eeb68"
+  },
+  "dataset_checksums": {
+    "train": "2eb9d723697913c3e1f9df2892a27a8dccb617865bf0bd2833d0edce3cfedb80",
+    "val": "b468a03524ea5419df4b4b0b0068d3c9e9362b9f397dfc654525cb5a330c9d06"
+  },
+  "failed_crops": 0,
+  "identity_rejections": {
+    "train": {
+      "accepted_identities": 1048,
+      "equation_holds": true,
+      "raw_identities": 1098,
+      "rejected_identities": 50,
+      "rejected_identity_table": [
+        {
+          "final_planned_crops": 3,
+          "identity": "M0101_2",
+          "raw_observations": 11,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 11
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M0204_28",
+          "raw_observations": 10,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 10
+        },
+        {
+          "final_planned_crops": 1,
+          "identity": "M0206_2",
+          "raw_observations": 5,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 5
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0206_24",
+          "raw_observations": 13,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 13
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0401_1",
+          "raw_observations": 13,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 13
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0401_10",
+          "raw_observations": 14,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 14
+        },
+        {
+          "final_planned_crops": 1,
+          "identity": "M0401_12",
+          "raw_observations": 4,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 4
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0401_2",
+          "raw_observations": 13,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 13
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0401_3",
+          "raw_observations": 13,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 13
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0401_4",
+          "raw_observations": 13,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 13
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0401_54",
+          "raw_observations": 13,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 13
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0401_55",
+          "raw_observations": 13,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 13
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0401_6",
+          "raw_observations": 13,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 13
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0401_68",
+          "raw_observations": 13,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 13
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0401_69",
+          "raw_observations": 13,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 13
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0401_8",
+          "raw_observations": 13,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 13
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M0402_46",
+          "raw_observations": 8,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 8
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M0604_6",
+          "raw_observations": 8,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 8
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0604_61",
+          "raw_observations": 46,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 14
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M0604_63",
+          "raw_observations": 8,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 8
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0605_1",
+          "raw_observations": 15,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 15
+        },
+        {
+          "final_planned_crops": 1,
+          "identity": "M0605_2",
+          "raw_observations": 1,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 1
+        },
+        {
+          "final_planned_crops": 1,
+          "identity": "M0605_3",
+          "raw_observations": 1,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 1
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0605_57",
+          "raw_observations": 15,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 15
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M0702_71",
+          "raw_observations": 14,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 14
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M0703_29",
+          "raw_observations": 7,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 7
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M0703_30",
+          "raw_observations": 7,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 7
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M0703_59",
+          "raw_observations": 6,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 6
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M0703_83",
+          "raw_observations": 10,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 10
+        },
+        {
+          "final_planned_crops": 0,
+          "identity": "M0704_103",
+          "raw_observations": 75,
+          "reason": "no_valid_observations_after_filtering",
+          "valid_observations": 0
+        },
+        {
+          "final_planned_crops": 0,
+          "identity": "M0704_104",
+          "raw_observations": 74,
+          "reason": "no_valid_observations_after_filtering",
+          "valid_observations": 0
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M0704_52",
+          "raw_observations": 6,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 6
+        },
+        {
+          "final_planned_crops": 0,
+          "identity": "M0704_86",
+          "raw_observations": 322,
+          "reason": "no_valid_observations_after_filtering",
+          "valid_observations": 0
+        },
+        {
+          "final_planned_crops": 1,
+          "identity": "M0704_87",
+          "raw_observations": 271,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 2
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M0704_89",
+          "raw_observations": 7,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 7
+        },
+        {
+          "final_planned_crops": 0,
+          "identity": "M0902_8",
+          "raw_observations": 84,
+          "reason": "no_valid_observations_after_filtering",
+          "valid_observations": 0
+        },
+        {
+          "final_planned_crops": 1,
+          "identity": "M0902_9",
+          "raw_observations": 1,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 1
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M1003_14",
+          "raw_observations": 7,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 7
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M1003_42",
+          "raw_observations": 21,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 14
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M1006_28",
+          "raw_observations": 10,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 10
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M1006_6",
+          "raw_observations": 11,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 11
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M1102_2",
+          "raw_observations": 7,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 7
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M1201_18",
+          "raw_observations": 10,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 10
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M1201_22",
+          "raw_observations": 11,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 11
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M1201_63",
+          "raw_observations": 11,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 11
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M1304_34",
+          "raw_observations": 9,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 9
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M1304_36",
+          "raw_observations": 6,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 6
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M1304_64",
+          "raw_observations": 9,
+          "reason": "fewer_than_10_valid_source_observations",
+          "valid_observations": 9
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M1304_67",
+          "raw_observations": 11,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 11
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M1305_26",
+          "raw_observations": 15,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 15
+        }
+      ],
+      "rejection_reason_counts": {
+        "fewer_than_10_valid_source_observations": 19,
+        "fewer_than_4_final_planned_crops": 27,
+        "no_valid_observations_after_filtering": 4
+      }
+    },
+    "val": {
+      "accepted_identities": 264,
+      "equation_holds": true,
+      "raw_identities": 268,
+      "rejected_identities": 4,
+      "rejected_identity_table": [
+        {
+          "final_planned_crops": 3,
+          "identity": "M0202_7",
+          "raw_observations": 13,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 13
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M0501_1",
+          "raw_observations": 10,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 10
+        },
+        {
+          "final_planned_crops": 2,
+          "identity": "M1002_20",
+          "raw_observations": 10,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 10
+        },
+        {
+          "final_planned_crops": 3,
+          "identity": "M1002_45",
+          "raw_observations": 11,
+          "reason": "fewer_than_4_final_planned_crops",
+          "valid_observations": 11
+        }
+      ],
+      "rejection_reason_counts": {
+        "fewer_than_4_final_planned_crops": 4
+      }
+    }
+  },
+  "leakage": {
+    "private_or_local_video_records": 0,
+    "result": "passed",
+    "test_sequence_records": 0
+  },
+  "manifest_checksums": {
+    "train": "c124861d46d2c2b523a01bb043ffd0a9495963e5045b22d3c0d21a707a9019a0",
+    "val": "93099b5ed2aadc8779b0509a4c9c2b325f39c76fff43ed2f19e2b07b86782e4f"
+  },
+  "missing_crops": 0,
+  "pixel_equality": {
+    "mismatches": 0,
+    "verified_crops": 81459
+  },
+  "preflight": {
+    "available_bytes": 225560678400,
+    "expected_crop_count": 81459,
+    "raw_pixel_bytes": 390010740,
+    "required_bytes_with_safe_overhead": 554622289
+  },
+  "schema_version": 1,
+  "splits": {
+    "train": {
+      "category_conflict_identities": 16,
+      "crop_count": 64338,
+      "crops_per_category": {
+        "1": 60072,
+        "2": 2904,
+        "3": 1362
+      },
+      "dimension_percentiles": {
+        "area": {
+          "0": 100.0,
+          "100": 166896.0,
+          "25": 522.0,
+          "50": 957.0,
+          "75": 1536.0
+        },
+        "height": {
+          "0": 10.0,
+          "100": 270.0,
+          "25": 21.0,
+          "50": 28.0,
+          "75": 39.0
+        },
+        "width": {
+          "0": 10.0,
+          "100": 976.0,
+          "25": 21.0,
+          "50": 34.0,
+          "75": 45.0
+        }
+      },
+      "failed_crops": 0,
+      "identities": 1048,
+      "identities_per_majority_category": {
+        "1": 968,
+        "2": 59,
+        "3": 21
+      },
+      "resumed_crops": 64338,
+      "total_bytes": 225119606,
+      "written_crops": 0
+    },
+    "val": {
+      "category_conflict_identities": 2,
+      "crop_count": 17121,
+      "crops_per_category": {
+        "1": 15756,
+        "2": 557,
+        "3": 808
+      },
+      "dimension_percentiles": {
+        "area": {
+          "0": 110.0,
+          "100": 19872.0,
+          "25": 874.0,
+          "50": 1176.0,
+          "75": 1517.0
+        },
+        "height": {
+          "0": 10.0,
+          "100": 149.0,
+          "25": 22.0,
+          "50": 30.0,
+          "75": 48.0
+        },
+        "width": {
+          "0": 10.0,
+          "100": 189.0,
+          "25": 24.0,
+          "50": 30.0,
+          "75": 52.0
+        }
+      },
+      "failed_crops": 0,
+      "identities": 264,
+      "identities_per_majority_category": {
+        "1": 249,
+        "2": 7,
+        "3": 8
+      },
+      "resumed_crops": 17121,
+      "total_bytes": 51789761,
+      "written_crops": 0
+    }
+  },
+  "total_crop_bytes": 276909367,
+  "visual_qa_artifacts": [
+    "experiments/reid_data/qa/representative_train.png",
+    "experiments/reid_data/qa/representative_val.png",
+    "experiments/reid_data/qa/smallest_accepted.png",
+    "experiments/reid_data/qa/car_examples.png",
+    "experiments/reid_data/qa/truck_examples.png",
+    "experiments/reid_data/qa/bus_examples.png",
+    "experiments/reid_data/qa/occlusion_out_of_view_codes.png"
+  ]
+}

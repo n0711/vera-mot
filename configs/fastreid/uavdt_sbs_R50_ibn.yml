@@ -1,0 +1,42 @@
+_BASE_: ../../baselines/BoT-SORT/fast_reid/configs/VeRi/sbs_R50-ibn.yml
+
+MODEL:
+  WEIGHTS: ""
+  BACKBONE:
+    DEPTH: 50x
+    WITH_IBN: True
+    PRETRAIN: True
+    PRETRAIN_PATH: experiments/reid_training/initialization/resnet50_ibn_a-d9d0bb7b.pth
+  LOSSES:
+    NAME: ("CrossEntropyLoss", "TripletLoss",)
+
+INPUT:
+  SIZE_TRAIN: [256, 256]
+  SIZE_TEST: [256, 256]
+
+DATASETS:
+  NAMES: ("UAVDTReIDTrain",)
+  # Validation evaluation is intentionally disabled pending a defensible
+  # same-sequence temporal protocol; see docs/reid_baseline_design.md.
+  TESTS: ()
+
+DATALOADER:
+  SAMPLER_TRAIN: BalancedIdentitySampler
+  NUM_INSTANCE: 4
+  NUM_WORKERS: 2
+
+SOLVER:
+  IMS_PER_BATCH: 16
+  MAX_EPOCH: 60  # Provisional until the GPU smoke test measures throughput.
+  AMP:
+    ENABLED: True
+
+OUTPUT_DIR: experiments/reid_training/uavdt_sbs_R50_ibn
+
+# Project-owned keys are installed by the safe configuration loader before merge.
+VERA_MOT:
+  SEED: 42
+  IDENTITIES_PER_BATCH: 4
+  TRAIN_DATASET: UAVDTReIDTrain
+  VALIDATION_DATASET: UAVDTReIDVal
+  VALIDATION_EVALUATOR_ENABLED: False

@@ -91,8 +91,15 @@ echo "========== RUNNING TRACKEVAL =========="
 python scripts/evaluate_uavdt_trackeval_all.py \
   2>&1 | tee "$METRIC_ROOT/uavdt_official_test.log"
 
-grep '^COMBINED' "$METRIC_ROOT/uavdt_official_test.log" \
-  > "$METRIC_ROOT/uavdt_official_combined.txt" || true
+combined_file="$METRIC_ROOT/uavdt_official_combined.txt"
+grep '^COMBINED' "$METRIC_ROOT/uavdt_official_test.log" > "$combined_file" || {
+  echo "TrackEval produced no COMBINED metric rows; refusing completion marker." >&2
+  exit 1
+}
+if [[ "$(grep -c '^COMBINED' "$combined_file")" -ne 4 ]]; then
+  echo "Expected four COMBINED metric rows, found $(grep -c '^COMBINED' "$combined_file")." >&2
+  exit 1
+fi
 
 {
   echo "Completed: $(date --iso-8601=seconds)"
