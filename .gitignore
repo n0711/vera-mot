@@ -70,3 +70,6 @@ experiments/tracking_baselines/botsort_no_reid/metrics/**
 # Local/generated inspection notes.
 docs/botsort_interface_audit.txt
 docs/uavdt_structure_audit.txt
+
+# Generated UAVDT ReID crop-quality analyses.
+experiments/reid_quality/
