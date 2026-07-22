@@ -23,6 +23,7 @@ experiments/reid_data/*.csv
 experiments/reid_data/crops/
 experiments/reid_data/qa/
 experiments/reid_training/
+experiments/reid_evaluation/
 
 experiments/results/*
 !experiments/results/.gitkeep
