@@ -1,7 +1,7 @@
 # VERA-MOT
 
 VERA-MOT (Visual Embedding Reliability Assessment for Multi-Object Tracking)
-is a BSc research project investigating whether unreliable vehicle ReID
+is a project investigating whether unreliable vehicle ReID
 embeddings can be prevented from corrupting association and long-term identity
 memory in UAV video.
 
@@ -165,7 +165,7 @@ official UAVDT MATLAB protocol has not been regression-tested.
 
 ## Licensing and limitations
 
-BoT-SORT and TrackEval are MIT-licensed; YOLOX is Apache-2.0 licensed. Their
+BoT-SORT and TrackEval are MIT-licensed, YOLOX is Apache-2.0 licensed. Their
 license files remain in the pinned submodules. Dataset and checkpoint licenses
 must be assessed separately.
 
