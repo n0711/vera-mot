@@ -5,36 +5,56 @@ is a project investigating whether unreliable vehicle ReID
 embeddings can be prevented from corrupting association and long-term identity
 memory in UAV video.
 
-## Current milestone
+## Status
 
-Milestone 3.1 freezes the executed UAVDT BoT-SORT no-ReID baseline. The
-repository currently implements a YOLOX-S single-class vehicle detector,
-BoT-SORT tracking without ReID, UAVDT ignore-region filtering, and TrackEval
-evaluation. ByteTrack experiments, vehicle ReID, VERA association gating,
-protected memory updates, ablations, and ROS 2/edge deployment are not
-implemented.
+| Stage | State |
+| --- | --- |
+| YOLOX-S single-class vehicle detector on UAVDT | done, held-out test AP 50.1, AP50 83.5 |
+| BoT-SORT without ReID, 20 UAVDT test sequences (Milestone 3.1) | done and frozen |
+| UAVDT ignore-region filtering and TrackEval evaluation | done |
+| Vehicle ReID data pipeline: manifests, crops, FastReID loader (Milestone 4) | built, awaiting human review of the visual-QA sheets |
+| Vehicle ReID training and the BoT-SORT ReID baseline | not started |
+| ByteTrack, VERA association gating, protected memory, ablations | not implemented |
+| ROS 2 or edge deployment | not implemented |
 
-The frozen 20-sequence result is HOTA 43.340, DetA 36.441, AssA 52.419,
+The frozen 20-sequence no-ReID result is HOTA 43.340, DetA 36.441, AssA 52.419,
 IDF1 56.964, 1,180 ID switches, MOTA 31.265, MOTP 74.136, precision 67.048,
 and recall 62.161. See
-`experiments/tracking_baselines/botsort_no_reid/manifest.yaml`.
+`experiments/tracking_baselines/botsort_no_reid/manifest.yaml`. The detector
+numbers are in `experiments/detector_evaluation/uavdt_test_summary.txt`.
 
-This repository is partially reproducible: code, revisions, configuration,
+ReID training stays blocked until a person has reviewed the crop contact sheets
+and the ImageNet initialization checkpoint has a verified source. The design,
+split and leakage rules are in
+[`docs/reid_baseline_design.md`](docs/reid_baseline_design.md).
+
+This repository is partially reproducible. Code, revisions, configuration,
 checksums, and compact evidence are preserved, but UAVDT and the trained
 detector checkpoint are not distributed.
 
 ## Repository layout
 
 - `baselines/`: pinned BoT-SORT, YOLOX, and TrackEval submodules.
-- `configs/`: YOLOX training, smoke-test, and held-out-test configurations.
-- `datasets/`: ignored local datasets; only the expected layouts are documented.
-- `docs/`: research scope, environment, and baseline status.
-- `experiments/`: frozen manifests and compact canonical evidence; generated
-  results remain ignored.
+- `configs/`: YOLOX training, smoke-test and held-out-test configurations, the
+  ReID sequence split, and the FastReID UAVDT config.
+- `datasets/`: ignored local datasets. Only the expected layouts are documented.
+- `docs/`: research scope, environment audits, baseline status, and the ReID
+  design.
+- `experiments/`: frozen manifests and compact canonical evidence. Generated
+  results stay ignored.
 - `patches/`: compatibility changes for pinned upstream code.
-- `scripts/`: dataset, detector, tracking, filtering, and evaluation entry points.
-- `src/vera_mot/`: project-owned reusable utilities.
+- `scripts/`: dataset, detector, tracking, filtering, evaluation, and ReID data
+  entry points.
+- `src/vera_mot/`: project-owned code (MOT file I/O, ReID manifests and crops,
+  the FastReID UAVDT adapter).
 - `tests/`: CPU-only, data-free unit tests.
+
+Where to read next:
+
+- [`docs/VERA_MOT_Project_Rationale_and_Current_Plan.md`](docs/VERA_MOT_Project_Rationale_and_Current_Plan.md): why the project exists and how it is staged
+- [`docs/research_contract.md`](docs/research_contract.md): the research questions and rules
+- [`docs/current_experiment.md`](docs/current_experiment.md): the frozen baseline in one page
+- [`docs/detector_baseline_status.md`](docs/detector_baseline_status.md) and [`docs/botsort_no_reid_baseline_status.md`](docs/botsort_no_reid_baseline_status.md): baseline details and limitations
 
 ## Environment and submodules
 
@@ -52,15 +72,23 @@ python -m pip install -r requirements-baseline.txt
 ./scripts/apply_botsort_compatibility_patch.sh
 ```
 
-The scripts prepend the pinned submodules to `sys.path`; no machine-local
+The scripts prepend the pinned submodules to `sys.path`, so no machine-local
 editable install is required. For interactive imports:
 
 ```bash
 export PYTHONPATH="$PWD/src:$PWD/baselines/YOLOX:$PWD/baselines/BoT-SORT:$PWD/baselines/TrackEval"
 ```
 
-`requirements-baseline.txt` describes the focused baseline environment.
-VERA-specific dependencies do not exist yet.
+`requirements-baseline.txt` describes the focused baseline environment, and
+`requirements-baseline-lock.txt` pins it exactly. `requirements-vera.txt` is
+empty because VERA-specific dependencies do not exist yet.
+
+Run the unit tests from the baseline environment (two of them import SciPy and
+PyTorch, the rest only need NumPy and Pillow):
+
+```bash
+PYTHONPATH="$PWD/src" python -m unittest discover -s tests
+```
 
 ## Data and weights
 
@@ -122,7 +150,7 @@ bash scripts/evaluate_yolox_uavdt.sh
 ```
 
 Expected local output includes
-`experiments/detector_evaluation/yolox_uavdt_s_1280_test/`; the compact frozen
+`experiments/detector_evaluation/yolox_uavdt_s_1280_test/`. The compact frozen
 summary is `experiments/detector_evaluation/uavdt_test_summary.txt`.
 
 ## Frozen no-ReID tracking
@@ -158,7 +186,7 @@ python scripts/filter_uavdt_ignore_regions.py
 python scripts/evaluate_uavdt_trackeval_all.py
 ```
 
-Filtered outputs are written under `uavdt_official/`; TrackEval outputs are
+Filtered outputs are written under `uavdt_official/` and TrackEval outputs
 under `metrics/uavdt_official/`. The custom ignore filter uses valid-GT IoU
 0.50 and unmatched-prediction ignore-region IoA 0.50. Its equivalence to the
 official UAVDT MATLAB protocol has not been regression-tested.
