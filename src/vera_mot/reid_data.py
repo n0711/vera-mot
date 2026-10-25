@@ -72,9 +72,12 @@ def sha256_file(path: Path) -> str:
 
 
 def percentile(values: list[int], percent: int) -> float | None:
-    if not values:
+    return _percentile_from_sorted(sorted(values), percent)
+
+
+def _percentile_from_sorted(ordered: list[int], percent: int) -> float | None:
+    if not ordered:
         return None
-    ordered = sorted(values)
     position = (len(ordered) - 1) * percent / 100
     lower = math.floor(position)
     upper = math.ceil(position)
@@ -127,8 +130,10 @@ def _distribution(rows: list[dict], key: str) -> dict[str, int]:
     return {str(code): count for code, count in sorted(Counter(row[key] for row in rows).items())}
 
 
-def _percentiles(values: list[int]) -> dict[str, float | None]:
-    return {str(point): percentile(values, point) for point in (0, 25, 50, 75, 100)}
+def percentiles(values: list[int]) -> dict[str, float | None]:
+    """Compute the five summary quantiles with one sort, without mutating values."""
+    ordered = sorted(values)
+    return {str(point): _percentile_from_sorted(ordered, point) for point in (0, 25, 50, 75, 100)}
 
 
 def build_split_rows(
@@ -312,11 +317,11 @@ def build_split_rows(
         "occlusion_distribution": _distribution(selected, "occlusion"),
         "out_of_view_distribution": _distribution(selected, "out_of_view"),
         "box_size_percentiles": {
-            "width": _percentiles([row["clipped_width"] for row in selected]),
-            "height": _percentiles([row["clipped_height"] for row in selected]),
-            "area": _percentiles([row["clipped_area"] for row in selected]),
+            "width": percentiles([row["clipped_width"] for row in selected]),
+            "height": percentiles([row["clipped_height"] for row in selected]),
+            "area": percentiles([row["clipped_area"] for row in selected]),
         },
-        "samples_per_identity_percentiles": _percentiles(list(retained_counts.values())),
+        "samples_per_identity_percentiles": percentiles(list(retained_counts.values())),
         "category_conflicts": {
             "identities_with_multiple_raw_categories": len(conflict_rows),
             "percentage_of_accepted_identities": round(100 * len(conflict_rows) / len(retained_counts), 4) if retained_counts else 0,

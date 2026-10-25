@@ -12,7 +12,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-from vera_mot.reid_data import ManifestError, percentile, sha256_file
+from vera_mot.reid_data import ManifestError, percentiles, sha256_file
 
 
 REGISTRY_FIELDS = [
@@ -253,7 +253,6 @@ def summarize_registry(rows: list[dict]) -> dict:
     widths = [int(row["width"]) for row in rows]
     heights = [int(row["height"]) for row in rows]
     areas = [width * height for width, height in zip(widths, heights)]
-    points = (0, 25, 50, 75, 100)
     return {
         "crop_count": len(rows), "total_bytes": sum(int(row["file_size"]) for row in rows),
         "identities": len({row["identity"] for row in rows}),
@@ -261,8 +260,8 @@ def summarize_registry(rows: list[dict]) -> dict:
         "identities_per_majority_category": {str(category): len({row["identity"] for row in rows if int(row["identity_majority_category"]) == category}) for category in (1, 2, 3)},
         "category_conflict_identities": len({row["identity"] for row in rows if int(row["identity_category_conflict"])}),
         "dimension_percentiles": {
-            "width": {str(point): percentile(widths, point) for point in points},
-            "height": {str(point): percentile(heights, point) for point in points},
-            "area": {str(point): percentile(areas, point) for point in points},
+            "width": percentiles(widths),
+            "height": percentiles(heights),
+            "area": percentiles(areas),
         },
     }
