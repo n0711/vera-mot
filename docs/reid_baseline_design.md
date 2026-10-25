@@ -1,5 +1,11 @@
 # Milestone 4.1 UAVDT ReID baseline design
 
+This document preserves the historical milestone boundaries. The training
+lifecycle, dedicated temporal evaluator and crop-quality analysis now exist;
+read `current_experiment.md` and `reid_evaluation_workflow.md` for current
+implementation and evidence status. Historical training restrictions below
+describe prerequisites at that milestone, not a request to repeat completed work.
+
 ## Data and leakage boundary
 
 Only the authoritative 30-sequence UAVDT MOT training pool may supply ReID training or validation observations. The frozen 20-sequence test set is forbidden from training, validation, checkpoint selection, and threshold tuning. Splits are sequence-disjoint and identities use the composite key `<sequence>_<target_id>` because UAVDT target IDs are sequence-local.

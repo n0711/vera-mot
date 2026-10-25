@@ -12,8 +12,10 @@ memory in UAV video.
 | YOLOX-S single-class vehicle detector on UAVDT | done, held-out test AP 50.1, AP50 83.5 |
 | BoT-SORT without ReID, 20 UAVDT test sequences (Milestone 3.1) | done and frozen |
 | UAVDT ignore-region filtering and TrackEval evaluation | done |
-| Vehicle ReID data pipeline: manifests, crops, FastReID loader (Milestone 4) | built, awaiting human review of the visual-QA sheets |
-| Vehicle ReID training and the BoT-SORT ReID baseline | not started |
+| Vehicle ReID data pipeline and training lifecycle (Milestone 4) | implemented; local training evidence is not distributed |
+| Sequence-local temporal ReID evaluation and crop-quality analysis | implemented; benchmark execution evidence pending |
+| Six-checkpoint validation comparison with verified resume | implemented; final epoch is the declared primary checkpoint |
+| BoT-SORT vehicle-ReID tracking baseline | not yet established in the tracked evidence |
 | ByteTrack, VERA association gating, protected memory, ablations | not implemented |
 | ROS 2 or edge deployment | not implemented |
 
@@ -23,8 +25,11 @@ and recall 62.161. See
 `experiments/tracking_baselines/botsort_no_reid/manifest.yaml`. The detector
 numbers are in `experiments/detector_evaluation/uavdt_test_summary.txt`.
 
-ReID training stays blocked until a person has reviewed the crop contact sheets
-and the ImageNet initialization checkpoint has a verified source. The design,
+The training entry point is `scripts/train_uavdt_fastreid.py`. A completed local
+60-epoch run was reported during project work, but its `completion.json` and
+checkpoints are absent from this repository. This status distinguishes available
+implementation from verified experiment evidence. Dataset QA and initialization
+provenance remain prerequisites for a new training run. The historical design,
 split and leakage rules are in
 [`docs/reid_baseline_design.md`](docs/reid_baseline_design.md).
 
@@ -83,12 +88,52 @@ export PYTHONPATH="$PWD/src:$PWD/baselines/YOLOX:$PWD/baselines/BoT-SORT:$PWD/ba
 `requirements-baseline-lock.txt` pins it exactly. `requirements-vera.txt` is
 empty because VERA-specific dependencies do not exist yet.
 
-Run the unit tests from the baseline environment (two of them import SciPy and
-PyTorch, the rest only need NumPy and Pillow):
+Run the CPU project tests without datasets, checkpoints, submodules or PyTorch:
 
 ```bash
-PYTHONPATH="$PWD/src" python -m unittest discover -s tests
+python -m pip install -r requirements-test.txt
+python -m pytest -q -m 'not integration'
 ```
+
+The separate FastReID configuration integration check requires the initialized
+BoT-SORT submodule and its PyTorch/FastReID dependencies. Run it in the recorded
+baseline environment with `python -m pytest -q -m integration`. CI runs the CPU
+suite; it does not run training, GPU inference, or the benchmark.
+
+## ReID validation and crop-quality analysis
+
+The dedicated temporal evaluator preserves sequence-local identities and compares
+each query only against its own sequence's gallery. It rejects a modified frozen
+validation registry. Every output labels bounded smoke runs separately from full
+validation; no frozen-test data is used for checkpoint selection or thresholds.
+
+With the six trained checkpoints and frozen crop data present, inspect the plan
+without loading a model or writing results:
+
+```bash
+python scripts/evaluate_uavdt_reid_checkpoints.py --plan-only
+```
+
+Run all six checkpoints, or resume verified completed evaluations:
+
+```bash
+python scripts/evaluate_uavdt_reid_checkpoints.py --verify-crops
+python scripts/evaluate_uavdt_reid_checkpoints.py --verify-crops --resume
+```
+
+`model_final.pth` is the predeclared primary checkpoint. Earlier checkpoints are
+diagnostics; the sweep does not pick a winner. All runs must use the same temporal
+split. Input fingerprints cover weights, registry, split, inherited configuration,
+evaluator/upstream source and runtime package versions. Resume checks hashes of
+all six output artifacts. Partial or mismatched runs stop with an error.
+
+The comparison is written to
+`experiments/reid_evaluation/checkpoints/comparison.json`. The raw crop-quality
+analysis can be run independently on train or validation manifests; it defines
+neither a reliability score nor gating thresholds. See the
+[temporal protocol](docs/reid_temporal_evaluation_protocol.md),
+[crop-quality protocol](docs/reid_crop_quality_protocol.md) and
+[evaluation workflow](docs/reid_evaluation_workflow.md).
 
 ## Data and weights
 
