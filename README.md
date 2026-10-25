@@ -202,3 +202,9 @@ only: a temporary miss followed by the same displayed ID is not proof of
 ground-truth identity recovery. Military/domain-shift footage has no
 quantitative annotations in this repository and is not part of the frozen
 benchmark.
+
+## Support this project
+
+If this project is useful to you, you can support its development with a one-off contribution via Revolut:
+
+**[revolut.me/nadiotis](https://revolut.me/nadiotis)**
