@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import pytest
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -124,6 +125,7 @@ class UAVDTFastReIDAdapterTests(unittest.TestCase):
         self.assertNotEqual(train.records[0].crop_path, val.records[0].crop_path)
 
 
+@pytest.mark.integration
 class UAVDTFastReIDConfigTests(unittest.TestCase):
     def test_configuration_invariants(self):
         script = ROOT / "scripts/dry_run_uavdt_fastreid_loader.py"

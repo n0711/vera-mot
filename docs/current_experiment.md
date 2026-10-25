@@ -32,3 +32,20 @@ and recall 62.161 across all 20 UAVDT test sequences.
 ## Next experiment
 
 Establish the controlled BoT-SORT vehicle-ReID baseline.
+
+## ReID validation implementation update (2026-10-25)
+
+The training lifecycle is implemented in `scripts/train_uavdt_fastreid.py`.
+A completed local 60-epoch run was reported during earlier project work; this
+checkout has neither its checkpoints nor completion evidence, so the report
+does not establish a tracked vehicle-ReID benchmark result.
+
+The temporal validation evaluator and raw crop-quality analysis have been
+integrated from their feature branches. The six-checkpoint sweep preserves
+`model_final.pth` as the declared primary checkpoint and verifies shared splits,
+provenance and resumable result checksums. Bounded smoke runs are explicitly
+labelled. See `docs/reid_evaluation_workflow.md` for the next executable steps.
+
+No new benchmark scores, reliability thresholds, VERA gating or protected-memory
+results are claimed by this implementation update. The frozen no-ReID evidence
+above remains the reference for a later controlled tracking comparison.
