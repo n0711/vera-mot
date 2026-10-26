@@ -61,6 +61,15 @@ Where to read next:
 - [`docs/current_experiment.md`](docs/current_experiment.md): the frozen baseline in one page
 - [`docs/detector_baseline_status.md`](docs/detector_baseline_status.md) and [`docs/botsort_no_reid_baseline_status.md`](docs/botsort_no_reid_baseline_status.md): baseline details and limitations
 
+## Optional ROS3-Limassol and external-VLM research path
+
+Read-only `src/vera_mot/vision_evidence.py` exports aggregate evidence from
+existing, single-sequence MOT results. `src/vera_mot/vlm_contract.py` validates
+a **declared** external VLM annotation manifest; it does not run or verify a
+vision-language model. Neither module sends commands, publishes video, or
+alters the frozen benchmark. See [ROS3 and VLM integration
+protocol](docs/ROS3_VLM_INTEGRATION.md) for commands, limits and provenance.
+
 ## Environment and submodules
 
 The recorded environment was Ubuntu 22.04, Python 3.10.12, PyTorch
