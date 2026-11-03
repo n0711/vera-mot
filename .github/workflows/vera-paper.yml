@@ -1,0 +1,67 @@
+name: Publish VERA-MOT XeLaTeX implementation note
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/papers/VERA_MOT_Implementation_Note.tex'
+      - '.github/workflows/vera-paper.yml'
+  pull_request:
+    paths:
+      - 'docs/papers/VERA_MOT_Implementation_Note.tex'
+      - '.github/workflows/vera-paper.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XeLaTeX and document fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-xetex texlive-latex-extra texlive-pictures \
+            fonts-liberation fonts-dejavu-core
+      - name: Compile manuscript twice and verify nonempty A4 PDF
+        run: |
+          cd docs/papers
+          xelatex -interaction=nonstopmode -halt-on-error -file-line-error VERA_MOT_Implementation_Note.tex
+          xelatex -interaction=nonstopmode -halt-on-error -file-line-error VERA_MOT_Implementation_Note.tex
+          test -s VERA_MOT_Implementation_Note.pdf
+          file VERA_MOT_Implementation_Note.pdf
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VERA-MOT-implementation-note-PDF
+          path: docs/papers/VERA_MOT_Implementation_Note.pdf
+          if-no-files-found: error
+          retention-days: 30
+
+  publish-pdf:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    needs: build-pdf
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: VERA-MOT-implementation-note-PDF
+          path: docs/papers
+      - name: Publish compiled PDF on main without overwriting other files
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/papers/VERA_MOT_Implementation_Note.pdf
+          if ! git diff --cached --quiet; then
+            git commit -m 'docs(paper): publish compiled VERA-MOT implementation note [skip ci]'
+            git push origin HEAD:main
+          fi
