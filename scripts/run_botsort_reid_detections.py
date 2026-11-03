@@ -21,9 +21,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from run_reid_detections import read_detections, sha256_stream  # noqa: E402
 from vera_mot.botsort_reid_bridge import (  # noqa: E402
-    create_tracker, detections_to_botsort,
+    create_tracker, detections_to_botsort, attach_quality_gate,
 )
 from vera_mot.reid_appearance import HSVHistogramEmbedder, ResNet18Embedder  # noqa: E402
+from vera_mot.reid_reliability import CropQualityGate, QualityGateConfig  # noqa: E402
 
 
 def run(
@@ -34,6 +35,7 @@ def run(
     embedder=None,
     cmc_method: str = "none",
     render: Path | None = None,
+    quality_gate: CropQualityGate | None = None,
 ) -> dict:
     if not video.is_file():
         raise FileNotFoundError(f"video missing: {video}")
@@ -53,6 +55,8 @@ def run(
             ROOT, embedder=embedder, frame_rate=max(1, int(round(fps))),
             name=video.stem, cmc_method=cmc_method,
         )
+        if quality_gate is not None:
+            attach_quality_gate(tracker, quality_gate, ROOT)
         if render is not None:
             size = (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)),
                     int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
@@ -101,7 +105,8 @@ def run(
     summary = {
         "scope": "unvalidated_pinned_botsort_appearance_tracking",
         "tracker": "pinned_BoT-SORT",
-        "mode": "appearance_reid" if embedder is not None else "no_reid",
+        "mode": ("vera_quality_gated_reid" if quality_gate is not None
+                 else "appearance_reid" if embedder is not None else "no_reid"),
         "embedding": embedder.name if embedder is not None else None,
         "encoder_calls": encoder.calls if encoder is not None else 0,
         "extracted_embeddings": encoder.features_extracted if encoder is not None else 0,
@@ -111,6 +116,7 @@ def run(
         "input_video_sha256": sha256_stream(video),
         "input_detection_sha256": sha256_stream(detection_csv),
         "embedding_weights_sha256": getattr(embedder, "weights_sha256", None),
+        "quality_gate": quality_gate.summary() if quality_gate is not None else None,
         "cmc_method": cmc_method,
         "note": "not ground-truth ReID or HOTA/IDF1 validation",
     }
@@ -123,19 +129,21 @@ def main() -> int:
     p.add_argument("--detections", type=Path, required=True)
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--render", type=Path)
-    p.add_argument("--mode", choices=("no-reid", "hsv-reid", "resnet18-reid"),
+    p.add_argument("--mode", choices=("no-reid", "hsv-reid", "vera-hsv-reid", "resnet18-reid"),
                    default="hsv-reid")
     p.add_argument("--cmc-method", choices=("none", "sparseOptFlow", "orb", "ecc"),
                    default="none")
     p.add_argument("--weights", type=Path)
     p.add_argument("--weights-sha256")
     p.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
+    p.add_argument("--quality-threshold", type=float, default=0.5,
+                   help="Provisional crop-quality threshold; only used with vera-hsv-reid")
     args = p.parse_args()
     if args.mode == "no-reid":
         if args.weights or args.weights_sha256:
             p.error("weights are only accepted for resnet18-reid")
         embedder = None
-    elif args.mode == "hsv-reid":
+    elif args.mode in ("hsv-reid", "vera-hsv-reid"):
         if args.weights or args.weights_sha256:
             p.error("weights are only accepted for resnet18-reid")
         embedder = HSVHistogramEmbedder()
@@ -143,8 +151,12 @@ def main() -> int:
         if args.weights is None:
             p.error("--weights required for resnet18-reid")
         embedder = ResNet18Embedder(args.weights, args.device, args.weights_sha256)
+    if args.mode != "vera-hsv-reid" and args.quality_threshold != 0.5:
+        p.error("--quality-threshold only applies to vera-hsv-reid")
+    policy = (CropQualityGate(QualityGateConfig(threshold=args.quality_threshold))
+              if args.mode == "vera-hsv-reid" else None)
     summary = run(args.video, args.detections, args.output, embedder=embedder,
-                  cmc_method=args.cmc_method, render=args.render)
+                  cmc_method=args.cmc_method, render=args.render, quality_gate=policy)
     args.output.with_suffix(".provenance.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
