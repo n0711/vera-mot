@@ -33,6 +33,7 @@ jobs:
           git -C baselines/BoT-SORT apply --check ../../patches/botsort-lazy-fastreid.patch
           git -C baselines/BoT-SORT apply ../../patches/botsort-lazy-fastreid.patch
           bash scripts/apply_botsort_vera_patch.sh
+          bash scripts/apply_botsort_vera_patch.sh  # idempotence regression
           python -m py_compile baselines/BoT-SORT/tracker/bot_sort.py
           python -m py_compile baselines/BoT-SORT/tracker/matching.py
 
