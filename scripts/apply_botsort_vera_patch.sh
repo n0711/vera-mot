@@ -19,13 +19,16 @@ if [[ "$actual" != "$PINNED_REVISION" ]]; then
   exit 1
 fi
 
-# Refuses unrelated changes; this script does not reset or force the submodule.
-bash "$PROJECT_ROOT/scripts/apply_botsort_reid_patch.sh"
-
+# Idempotence check MUST precede earlier patches. The VERA patch changes
+# matching.py lines that the ReID compatibility patch also touches, so the
+# older patch's reverse-check is no longer valid after VERA is applied.
 if git -C "$SUBMODULE" apply --reverse --check "$VERA_PATCH" >/dev/null 2>&1; then
   echo "VERA reliability gate patch is already applied."
   exit 0
 fi
+
+# Refuses unrelated changes; this script does not reset or force submodule.
+bash "$PROJECT_ROOT/scripts/apply_botsort_reid_patch.sh"
 
 actual_bot="$(git -C "$SUBMODULE" hash-object tracker/bot_sort.py)"
 actual_matching="$(git -C "$SUBMODULE" hash-object tracker/matching.py)"
