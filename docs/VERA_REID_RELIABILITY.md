@@ -51,7 +51,8 @@ On the new development branch, with the existing Python 3.10 venv active:
 
     cd ~/vera-mot
     git submodule update --init --recursive
-    bash scripts/apply_botsort_compatibility_patch.sh
+    # Only on a fresh, unpatched submodule, apply baseline compatibility once:
+    # bash scripts/apply_botsort_compatibility_patch.sh
     bash scripts/apply_botsort_vera_patch.sh
     python -m pytest -q -m 'not integration'
     python -m pytest -v -m integration tests/test_vera_reid_quality_gate.py
@@ -59,7 +60,10 @@ On the new development branch, with the existing Python 3.10 venv active:
 The VERA patch installer ensures the previous ReID and lazy import patches
 are installed. It checks the exact known Git blob hashes of the pre-VERA
 tracker files; unrelated local modifications are rejected, never overwritten
-or reset. It remains opt-in and does not move the submodule pin.
+or reset. The VERA installer is idempotent and must be used for later
+rechecks; the earlier ReID installer is not designed to reverse-verify files
+once the new VERA changes overlap matching.py. It remains opt-in and does not
+move the submodule pin.
 
 ## Side-by-side synthetic smoke experiment
 
