@@ -16,6 +16,7 @@ memory in UAV video.
 | Sequence-local temporal ReID evaluation and crop-quality analysis | implemented; benchmark execution evidence pending |
 | Six-checkpoint validation comparison with verified resume | implemented; final epoch is the declared primary checkpoint |
 | BoT-SORT vehicle-ReID tracking baseline | not yet established in the tracked evidence |
+| Weight-free online ReID appearance association (separate prototype) | implemented; synthetic tests only; see docs/REID_WITHOUT_UAVDT.md |
 | ByteTrack, VERA association gating, protected memory, ablations | not implemented |
 | ROS 2 or edge deployment | not implemented |
 
@@ -109,6 +110,23 @@ BoT-SORT submodule and its PyTorch/FastReID dependencies. Run it in the recorded
 baseline environment with `python -m pytest -q -m integration`. CI runs the CPU
 suite; it does not run training, GPU inference, or the benchmark.
 
+## Weight-free online appearance matching prototype
+
+This independent prototype runs without UAVDT or trained detector checkpoints.
+It accepts a video and detector-box CSV, uses HSV appearance features with
+one-to-one matching, and emits tentative track identities. An optional local
+generic ResNet18 ImageNet feature extractor is also available. Neither method
+is validated vehicle-trained ReID or integrated BoT-SORT-ReID.
+
+~~~bash
+python scripts/make_reid_demo.py
+python scripts/run_reid_detections.py \
+  --video experiments/reid_online/synthetic_demo/synthetic_vehicle_demo.mp4 \
+  --detections experiments/reid_online/synthetic_demo/synthetic_vehicle_detections.csv \
+  --output experiments/reid_online/synthetic_demo/associated.txt
+~~~
+
+See [implementation and limitations](docs/REID_WITHOUT_UAVDT.md).
 ## ReID validation and crop-quality analysis
 
 The dedicated temporal evaluator preserves sequence-local identities and compares
