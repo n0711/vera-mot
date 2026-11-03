@@ -25,18 +25,26 @@ Run from the repository root, with its baseline virtual environment active:
 
 ```bash
 git submodule update --init baselines/BoT-SORT
-python scripts/evaluate_uavdt_reid_checkpoints.py --plan-only
+python scripts/evaluate_uavdt_reid_checkpoints.py --plan-only --verify-training-provenance
 ```
 
 Planning checks file availability, the frozen registry hash and inherited YAML
-dependencies, then prints the complete six-job plan. It imports no PyTorch,
-loads no weights and writes nothing. A successful plan is not an inference test.
+dependencies, then prints the complete six-job plan. With
+`--verify-training-provenance`, it also rejects missing/inconsistent
+`launch_manifest.json` and `completion.json`, checks the declared training
+invariants and compares recorded byte sizes and SHA-256 checksums against all
+checkpoint files in the completion inventory. This only proves internal record
+consistency; it does not independently authenticate training, source datasets,
+or initialization weights. The hashes of both metadata files and all required
+checkpoints become part of each job's resume fingerprint. Planning imports no
+PyTorch, loads no weights and writes nothing. A successful plan is not an
+inference test.
 
 A bounded smoke sweep uses a separate output directory:
 
 ```bash
 python scripts/evaluate_uavdt_reid_checkpoints.py \
-  --max-identities 8 --num-workers 0 --verify-crops \
+  --max-identities 8 --num-workers 0 --verify-crops --verify-training-provenance \
   --output-dir experiments/reid_evaluation/smoke
 ```
 
@@ -45,8 +53,8 @@ validation split. Every output is labelled `smoke`, even if a large limit would
 include every identity. Run full validation separately:
 
 ```bash
-python scripts/evaluate_uavdt_reid_checkpoints.py --verify-crops
-python scripts/evaluate_uavdt_reid_checkpoints.py --verify-crops --resume
+python scripts/evaluate_uavdt_reid_checkpoints.py --verify-crops --verify-training-provenance
+python scripts/evaluate_uavdt_reid_checkpoints.py --verify-crops --verify-training-provenance --resume
 ```
 
 Each checkpoint gets a subdirectory containing the temporal evaluator's six
@@ -57,7 +65,8 @@ sections; these are retrieval metrics, not HOTA or IDF1 tracking scores.
 
 Resume requires the same checkpoint, frozen registry, split, complete inherited
 configuration, evaluator/upstream Python sources, runtime package versions,
-device and execution options. All six output artifacts must still match their
+device and execution options. When provenance verification is enabled, the
+original training records and checkpoint inventory must also remain unchanged. All six output artifacts must still match their
 recorded SHA-256 values. Stale, edited or partial outputs stop before inference.
 Use a fresh output directory or explicit `--overwrite` for a replacement run.
 A replacement removes the older comparison report before starting, so a failed

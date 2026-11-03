@@ -196,3 +196,80 @@ def test_cli_sweep_resume_and_failed_overwrite(workspace, monkeypatch):
         module.main()
     assert exc.value.code == 2
     assert not (workspace / "output/comparison.json").exists()
+
+
+def write_training_evidence(root):
+    """Write self-consistent synthetic training metadata, not a real training claim."""
+    import hashlib
+
+    directory = root / "checkpoints"
+    launch = {
+        "train_identities": 1048, "train_images": 64338,
+        "validation_identities": 264, "validation_images": 17121,
+        "epochs": 60, "seed": 42, "iterations_per_epoch": 10,
+        "total_iterations": 600, "frozen_test_records": 0, "private_records": 0,
+        "git_revision": "a" * 40, "botsort_revision": "b" * 40,
+        "initialization_observed_sha256": "c" * 64,
+    }
+    checkpoints = [
+        {"filename": name, "bytes": (directory / name).stat().st_size,
+         "sha256": sha256_file(directory / name)}
+        for name in CHECKPOINT_NAMES
+    ]
+    completion = {
+        "epochs_completed": 60, "iterations_completed": 600,
+        "checkpoints": checkpoints,
+    }
+    (directory / "launch_manifest.json").write_text(json.dumps(launch))
+    (directory / "completion.json").write_text(json.dumps(completion))
+    return directory
+
+
+def test_training_provenance_binds_sweep_fingerprint(workspace):
+    from vera_mot.reid_training_provenance import verify_training_provenance
+
+    directory = write_training_evidence(workspace)
+    evidence = verify_training_provenance(directory, CHECKPOINT_NAMES)
+    assert evidence["verification"] == "internal_record_and_bytes_only"
+    assert set(evidence["checkpoint_sha256"]) == set(CHECKPOINT_NAMES)
+    unverified = plan(workspace)["jobs"][0]
+    verified = plan(workspace, verify_training_provenance=True)["jobs"][0]
+    assert unverified["input_fingerprint"] != verified["input_fingerprint"]
+    assert verified["inputs"]["training_provenance"] == evidence
+    completion = json.loads((directory / "completion.json").read_text())
+    completion["completed_utc"] = "synthetic modification"
+    (directory / "completion.json").write_text(json.dumps(completion))
+    changed = plan(workspace, verify_training_provenance=True)["jobs"][0]
+    assert changed["input_fingerprint"] != verified["input_fingerprint"]
+
+
+def test_training_provenance_rejects_missing_modified_and_inconsistent_inputs(workspace):
+    directory = workspace / "checkpoints"
+    with pytest.raises(ManifestError, match="missing or invalid training provenance"):
+        plan(workspace, verify_training_provenance=True)
+    directory = write_training_evidence(workspace)
+    (directory / "model_0019.pth").write_text("changed checkpoint")
+    with pytest.raises(ManifestError, match="differs from completion"):
+        plan(workspace, verify_training_provenance=True)
+    write_training_evidence(workspace)
+    launch = json.loads((directory / "launch_manifest.json").read_text())
+    launch["frozen_test_records"] = 1
+    (directory / "launch_manifest.json").write_text(json.dumps(launch))
+    with pytest.raises(ManifestError, match="frozen_test_records"):
+        plan(workspace, verify_training_provenance=True)
+    write_training_evidence(workspace)
+    completion = json.loads((directory / "completion.json").read_text())
+    completion["checkpoints"].append(completion["checkpoints"][0])
+    (directory / "completion.json").write_text(json.dumps(completion))
+    with pytest.raises(ManifestError, match="duplicate training checkpoint"):
+        plan(workspace, verify_training_provenance=True)
+
+
+def test_cli_verified_plan_has_no_inference_or_writes(workspace, monkeypatch, capsys):
+    write_training_evidence(workspace)
+    module = load_cli(workspace, monkeypatch, "--plan-only", "--verify-training-provenance")
+    monkeypatch.setattr(module.subprocess, "run", lambda *a, **k: pytest.fail("inference was launched"))
+    assert module.main() == 0
+    record = json.loads(capsys.readouterr().out)
+    assert record["jobs"][0]["inputs"]["training_provenance"]["verification"] == "internal_record_and_bytes_only"
+    assert not (workspace / "output").exists()

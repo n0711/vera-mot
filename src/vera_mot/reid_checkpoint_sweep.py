@@ -10,6 +10,7 @@ from pathlib import Path
 import yaml
 
 from vera_mot.reid_data import ManifestError, sha256_file
+from vera_mot.reid_training_provenance import verify_training_provenance as verify_training_record
 from vera_mot.reid_temporal_eval import PROTOCOL_VERSION
 
 
@@ -60,13 +61,16 @@ def configuration_hashes(path: Path, active: tuple[Path, ...] = ()) -> dict[str,
 
 def build_plan(project_root: Path, checkpoint_dir: Path, config: Path, registry: Path,
                output_dir: Path, *, device: str, batch_size: int, num_workers: int,
-               max_identities: int | None, verify_crops: bool) -> dict:
+               max_identities: int | None, verify_crops: bool,
+               verify_training_provenance: bool = False) -> dict:
     if batch_size < 1 or num_workers < 0 or (max_identities is not None and max_identities < 1):
         raise ManifestError("invalid batch size, worker count or identity limit")
     checkpoint_dir, output_dir = checkpoint_dir.resolve(), output_dir.resolve()
     missing = [name for name in CHECKPOINT_NAMES if not (checkpoint_dir / name).is_file()]
     if missing:
         raise ManifestError(f"missing trained checkpoints in {checkpoint_dir}: {', '.join(missing)}")
+    training_record = (verify_training_record(checkpoint_dir, CHECKPOINT_NAMES)
+                       if verify_training_provenance else None)
     config, registry = config.resolve(), registry.resolve()
     # Include project evaluator code and the pinned upstream implementation, so
     # a changed evaluator cannot silently reuse an earlier result.
@@ -85,6 +89,7 @@ def build_plan(project_root: Path, checkpoint_dir: Path, config: Path, registry:
         "split_configuration_sha256": sha256_file(project_root / "configs/uavdt_reid_split.yaml"),
         "source_sha256": {str(path.relative_to(project_root)): sha256_file(path) for path in sources},
         "runtime_versions": runtime_versions(),
+        "training_provenance": training_record,
         "evaluation_scope": "smoke" if max_identities is not None else "full_validation",
         "device": device, "batch_size": batch_size, "num_workers": num_workers,
         "max_identities": max_identities, "verify_crops": verify_crops,
@@ -106,7 +111,8 @@ def validate_result(job: dict) -> dict:
         summary = json.loads((output / "summary.json").read_text(encoding="utf-8"))
         manifest = json.loads((output / "protocol_manifest.json").read_text(encoding="utf-8"))
         expected = {key: value for key, value in job["inputs"].items()
-                    if key not in {"configuration_dependencies", "source_sha256", "runtime_versions"}}
+                    if key not in {"configuration_dependencies", "source_sha256", "runtime_versions",
+                                   "training_provenance"}}
         for document in (summary, manifest):
             if any(key not in document or document[key] != value for key, value in expected.items()):
                 raise ManifestError(f"evaluation provenance mismatch: {output}")

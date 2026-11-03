@@ -27,6 +27,8 @@ def main() -> int:
     parser.add_argument("--num-workers", type=int, default=2)
     parser.add_argument("--max-identities", type=int)
     parser.add_argument("--verify-crops", action="store_true")
+    parser.add_argument("--verify-training-provenance", action="store_true",
+                        help="check training metadata, all recorded checkpoint hashes and sizes")
     parser.add_argument("--plan-only", action="store_true", help="validate inputs and print the plan without inference or writes")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--resume", action="store_true", help="reuse only fingerprint- and checksum-matching completed runs")
@@ -35,7 +37,8 @@ def main() -> int:
     try:
         plan = build_plan(PROJECT_ROOT, args.checkpoint_dir, args.config, args.registry, args.output_dir,
                           device=args.device, batch_size=args.batch_size, num_workers=args.num_workers,
-                          max_identities=args.max_identities, verify_crops=args.verify_crops)
+                          max_identities=args.max_identities, verify_crops=args.verify_crops,
+                          verify_training_provenance=args.verify_training_provenance)
         if plan["jobs"][0]["inputs"]["registry_sha256"] != EXPECTED["val"]["registry_sha256"]:
             raise ManifestError("stale or modified validation crop registry checksum")
         if args.plan_only:
