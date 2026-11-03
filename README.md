@@ -18,6 +18,7 @@ memory in UAV video.
 | BoT-SORT vehicle-ReID tracking baseline | not yet established in the tracked evidence |
 | Weight-free online ReID appearance association (separate prototype) | implemented; synthetic tests only; see docs/REID_WITHOUT_UAVDT.md |
 | Pinned BoT-SORT ReID adapter (opt-in, no UAVDT) | implementation and compatibility patch committed; real upstream runtime not yet validated on the user's device |
+| VERA crop-quality-gated ReID (experimental) | guarded appearance matching and memory updates implemented; synthetic CI only; no real vehicle identity metrics |
 | ByteTrack, VERA association gating, protected memory, ablations | not implemented |
 | ROS 2 or edge deployment | not implemented |
 
@@ -141,6 +142,28 @@ Run the paired synthetic no-ReID vs HSV-ReID trial only after installing
 pinned runtime dependencies and applying the compatibility patches.
 Full setup, safety boundaries and commands: 
 [BoT-SORT ReID integration](docs/BOTSORT_REID_INTEGRATION.md).
+## Experimental VERA reliability gate (M4.6)
+
+An optional mode filters BoT-SORT appearance evidence using conservative crop
+size, Laplacian-focus and in-frame-box proxies. Rejected appearance vectors
+are excluded from matching and track feature memory; motion/IoU association
+remains possible. This does not require UAVDT, model training or historical
+checkpoints. Real vehicle identity performance is not established.
+
+Opt-in after applying the pinned compatibility patches:
+
+~~~bash
+bash scripts/apply_botsort_vera_patch.sh
+python -m pytest -v -m integration tests/test_vera_reid_quality_gate.py
+python scripts/make_reid_demo.py
+python scripts/run_botsort_reid_detections.py \
+  --video experiments/reid_online/synthetic_demo/synthetic_vehicle_demo.mp4 \
+  --detections experiments/reid_online/synthetic_demo/synthetic_vehicle_detections.csv \
+  --mode vera-hsv-reid --quality-threshold 0.5 \
+  --output experiments/reid_online/synthetic_demo/botsort_vera_hsv_reid.txt
+~~~
+
+See [research protocol and limitations](docs/VERA_REID_RELIABILITY.md).
 ## ReID validation and crop-quality analysis
 
 The dedicated temporal evaluator preserves sequence-local identities and compares

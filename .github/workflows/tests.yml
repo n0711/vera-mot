@@ -32,7 +32,10 @@ jobs:
           git -C baselines/BoT-SORT apply ../../patches/botsort-reid-compat.patch
           git -C baselines/BoT-SORT apply --check ../../patches/botsort-lazy-fastreid.patch
           git -C baselines/BoT-SORT apply ../../patches/botsort-lazy-fastreid.patch
+          bash scripts/apply_botsort_vera_patch.sh
+          bash scripts/apply_botsort_vera_patch.sh  # idempotence regression
           python -m py_compile baselines/BoT-SORT/tracker/bot_sort.py
+          python -m py_compile baselines/BoT-SORT/tracker/matching.py
 
 
   botsort-reid-runtime-smoke:
@@ -56,5 +59,6 @@ jobs:
         run: |
           bash scripts/apply_botsort_compatibility_patch.sh
           bash scripts/apply_botsort_reid_patch.sh
-      - name: Real tracker import and appearance association integration test
-        run: python -m pytest -v -m integration tests/test_botsort_reid_bridge.py
+          bash scripts/apply_botsort_vera_patch.sh
+      - name: Real tracker and VERA quality-gate integration tests
+        run: python -m pytest -v -m integration tests/test_botsort_reid_bridge.py tests/test_vera_reid_quality_gate.py tests/test_vera_reid_video_integration.py

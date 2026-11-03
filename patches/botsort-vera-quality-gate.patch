@@ -1,0 +1,52 @@
+diff --git a/tracker/bot_sort.py b/tracker/bot_sort.py
+--- a/tracker/bot_sort.py
++++ b/tracker/bot_sort.py
+@@ -267,6 +267,17 @@
+         '''Extract embeddings '''
+         if self.args.with_reid:
+             features_keep = self.encoder.inference(img, dets)
++            # Optional project-owned VERA reliability policy. Ineligible
++            # detections keep their boxes but contribute no appearance feature
++            # to either association or the track's long-term memory.
++            if getattr(self, "appearance_policy", None) is not None:
++                allowed = self.appearance_policy.allowed(img, dets)
++                if (not isinstance(allowed, np.ndarray)
++                        or allowed.dtype != np.bool_
++                        or allowed.shape != (len(dets),)):
++                    raise ValueError("appearance_policy.allowed must return Boolean (N,)")
++                features_keep = [feature if accepted else None
++                                 for feature, accepted in zip(features_keep, allowed)]
+ 
+         if len(dets) > 0:
+             '''Detections'''
+diff --git a/tracker/matching.py b/tracker/matching.py
+--- a/tracker/matching.py
++++ b/tracker/matching.py
+@@ -133,13 +133,22 @@
+     :return: cost_matrix np.ndarray
+     """
+ 
+-    cost_matrix = np.zeros((len(tracks), len(detections)), dtype=float)
++    # A track or detection with no reliable features must be matched through
++    # the upstream IoU/motion path, never via an invented appearance vector.
++    # BoT-SORT divides this cost by two, so 2.0 becomes the rejected 1.0.
++    cost_matrix = np.full((len(tracks), len(detections)), 2.0, dtype=float)
+     if cost_matrix.size == 0:
+         return cost_matrix
+-    det_features = np.asarray([track.curr_feat for track in detections], dtype=float)
+-    track_features = np.asarray([track.smooth_feat for track in tracks], dtype=float)
+-
+-    cost_matrix = np.maximum(0.0, cdist(track_features, det_features, metric))  # / 2.0  # Nomalized features
++    valid_tracks = [(i, t.smooth_feat) for i, t in enumerate(tracks)
++                    if t.smooth_feat is not None]
++    valid_dets = [(j, d.curr_feat) for j, d in enumerate(detections)
++                  if d.curr_feat is not None]
++    if valid_tracks and valid_dets:
++        track_features = np.asarray([f for _, f in valid_tracks], dtype=float)
++        det_features = np.asarray([f for _, f in valid_dets], dtype=float)
++        distances = np.maximum(0.0, cdist(track_features, det_features, metric))
++        cost_matrix[np.ix_([i for i, _ in valid_tracks],
++                           [j for j, _ in valid_dets])] = distances
+     return cost_matrix
+ 
+ 
