@@ -60,4 +60,4 @@ jobs:
           bash scripts/apply_botsort_reid_patch.sh
           bash scripts/apply_botsort_vera_patch.sh
       - name: Real tracker and VERA quality-gate integration tests
-        run: python -m pytest -v -m integration tests/test_botsort_reid_bridge.py tests/test_vera_reid_quality_gate.py
+        run: python -m pytest -v -m integration tests/test_botsort_reid_bridge.py tests/test_vera_reid_quality_gate.py tests/test_vera_reid_video_integration.py
