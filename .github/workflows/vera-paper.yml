@@ -26,7 +26,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             texlive-xetex texlive-latex-extra texlive-pictures \
-            fonts-liberation fonts-dejavu-core
+            texlive-fonts-recommended fonts-liberation fonts-dejavu-core
       - name: Compile manuscript twice and verify nonempty A4 PDF
         run: |
           cd docs/papers
