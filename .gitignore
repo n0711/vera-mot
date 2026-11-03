@@ -74,3 +74,6 @@ docs/uavdt_structure_audit.txt
 
 # Generated UAVDT ReID crop-quality analyses.
 experiments/reid_quality/
+
+# Unvalidated online appearance association outputs.
+experiments/reid_online/

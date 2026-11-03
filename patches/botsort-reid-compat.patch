@@ -1,0 +1,60 @@
+diff --git a/tracker/bot_sort.py b/tracker/bot_sort.py
+--- a/tracker/bot_sort.py
++++ b/tracker/bot_sort.py
+@@ -17,7 +17,7 @@
+     def __init__(self, tlwh, score, feat=None, feat_history=50):
+ 
+         # wait activate
+-        self._tlwh = np.asarray(tlwh, dtype=np.float)
++        self._tlwh = np.asarray(tlwh, dtype=float)
+         self.kalman_filter = None
+         self.mean, self.covariance = None, None
+         self.is_activated = False
+@@ -27,10 +27,10 @@
+ 
+         self.smooth_feat = None
+         self.curr_feat = None
+-        if feat is not None:
+-            self.update_features(feat)
+         self.features = deque([], maxlen=feat_history)
+         self.alpha = 0.9
++        if feat is not None:
++            self.update_features(feat)
+ 
+     def update_features(self, feat):
+         feat /= np.linalg.norm(feat)
+diff --git a/tracker/matching.py b/tracker/matching.py
+--- a/tracker/matching.py
++++ b/tracker/matching.py
+@@ -57,13 +57,13 @@
+ 
+     :rtype ious np.ndarray
+     """
+-    ious = np.zeros((len(atlbrs), len(btlbrs)), dtype=np.float)
++    ious = np.zeros((len(atlbrs), len(btlbrs)), dtype=float)
+     if ious.size == 0:
+         return ious
+ 
+     ious = bbox_ious(
+-        np.ascontiguousarray(atlbrs, dtype=np.float),
+-        np.ascontiguousarray(btlbrs, dtype=np.float)
++        np.ascontiguousarray(atlbrs, dtype=float),
++        np.ascontiguousarray(btlbrs, dtype=float)
+     )
+ 
+     return ious
+@@ -133,11 +133,11 @@
+     :return: cost_matrix np.ndarray
+     """
+ 
+-    cost_matrix = np.zeros((len(tracks), len(detections)), dtype=np.float)
++    cost_matrix = np.zeros((len(tracks), len(detections)), dtype=float)
+     if cost_matrix.size == 0:
+         return cost_matrix
+-    det_features = np.asarray([track.curr_feat for track in detections], dtype=np.float)
+-    track_features = np.asarray([track.smooth_feat for track in tracks], dtype=np.float)
++    det_features = np.asarray([track.curr_feat for track in detections], dtype=float)
++    track_features = np.asarray([track.smooth_feat for track in tracks], dtype=float)
+ 
+     cost_matrix = np.maximum(0.0, cdist(track_features, det_features, metric))  # / 2.0  # Nomalized features
+     return cost_matrix
