@@ -115,6 +115,35 @@ def attach_project_encoder(tracker, embedder) -> BoTSORTAppearanceEncoder:
     return encoder
 
 
+
+def attach_quality_gate(tracker, policy, project_root: Path):
+    """Opt-in reliability gating; refuse to run on an unpatched tracker.
+
+    On low-quality detections the vetted upstream patch replaces features
+    with None *before* constructing STrack. This means appearance similarity
+    cannot match those observations, and their features never enter memory.
+    """
+    if not getattr(getattr(tracker, "args", None), "with_reid", False):
+        raise ValueError("quality gating requires an enabled appearance encoder")
+    if not callable(getattr(policy, "allowed", None)):
+        raise TypeError("quality policy must implement allowed(frame, xyxy)")
+    if hasattr(tracker, "appearance_policy"):
+        raise ValueError("quality policy already attached")
+    upstream = Path(project_root).resolve() / "baselines/BoT-SORT/tracker"
+    bot_sort_text = (upstream / "bot_sort.py").read_text(encoding="utf-8")
+    matching_text = (upstream / "matching.py").read_text(encoding="utf-8")
+    if (
+        'self.appearance_policy.allowed(img, dets)' not in bot_sort_text
+        or "valid_tracks = [(i, t.smooth_feat)" not in matching_text
+    ):
+        raise RuntimeError(
+            "VERA quality gate is not installed in the pinned BoT-SORT files; "
+            "run bash scripts/apply_botsort_vera_patch.sh and retry"
+        )
+    tracker.appearance_policy = policy
+    return policy
+
+
 def load_pinned_botsort(project_root: Path):
     """Load upstream BoT-SORT only after verifying the known ReID bug fixes."""
     root = Path(project_root).resolve() / "baselines/BoT-SORT"
