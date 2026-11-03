@@ -164,6 +164,19 @@ python scripts/run_botsort_reid_detections.py \
 ~~~
 
 See [research protocol and limitations](docs/VERA_REID_RELIABILITY.md).
+## Working XeLaTeX research note (M4.6)
+
+**VERA-MOT: Reliability-Gated Appearance Association and Protected Feature Memory**
+is available as an [editable XeLaTeX implementation note](docs/papers/VERA_MOT_Implementation_Note.tex)
+and, after the [paper build workflow](.github/workflows/vera-paper.yml) has
+published its output on main, a [five-page PDF](docs/papers/VERA_MOT_Implementation_Note.pdf).
+The note is **preliminary and not peer reviewed**: it documents executable
+quality-gated appearance matching, protected memory and synthetic CI evidence.
+**No identity-annotated vehicle performance, IDF1/HOTA improvement, or
+vehicle-trained ReID accuracy has been established.**
+
+See [the manuscript status](docs/papers/README.md) and
+[M4.6 research checkpoint](docs/checkpoints/M4_6_REID_2026-11-03.md).
 ## ReID validation and crop-quality analysis
 
 The dedicated temporal evaluator preserves sequence-local identities and compares
