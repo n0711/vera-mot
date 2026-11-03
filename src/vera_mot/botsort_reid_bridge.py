@@ -137,10 +137,12 @@ def load_pinned_botsort(project_root: Path):
         or "self.update_features(feat)" not in bot_sort_text
         or bot_sort_text.index("self.features = deque([], maxlen=feat_history)")
         > bot_sort_text.index("self.update_features(feat)")
+        or "from fast_reid.fast_reid_interfece import FastReIDInterface"
+        in bot_sort_text.partition("class STrack")[0]
     ):
         raise RuntimeError(
-            "BoT-SORT ReID compatibility fixes absent; run "
-            "bash scripts/apply_botsort_reid_patch.sh after baseline compatibility patch"
+            "Pinned BoT-SORT ReID runtime compatibility fixes absent; run "
+            "bash scripts/apply_botsort_reid_patch.sh (also installs lazy FastReID import)"
         )
     # Import only inside explicit runtime path. Unit tests and CI do not need
     # torch, lap, cython-bbox, YOLOX, or upstream FastReID.
@@ -150,8 +152,10 @@ def load_pinned_botsort(project_root: Path):
         from tracker.bot_sort import BoTSORT
     except ImportError as exc:
         raise RuntimeError(
-            "BoT-SORT runtime dependencies unavailable; install the pinned baseline "
-            "environment and verify the upstream compatibility patch"
+            f"BoT-SORT import failed with {type(exc).__name__}: {exc}. "
+            "Install the missing dependency in the active .venv, then run "
+            "bash scripts/apply_botsort_reid_patch.sh and retry. "
+            "The original traceback is preserved as the chained cause."
         ) from exc
     return BoTSORT
 
