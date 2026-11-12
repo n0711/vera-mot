@@ -41,12 +41,12 @@ the source file matches the run's recorded bytes.
 
 Use existing authorized files and prior BoT-SORT outputs for the **same**
 sequence. The video and detection CSV must be the exact files supplied to both
-runs; the GT must be the original 9-column UAVDT file. A single example:
+runs; the GT must be the original 9-column UAVDT *_gt_whole.txt file. A single example:
 
 ~~~bash
 python scripts/preflight_vera_reid_validation.py \
   --sequence M0201 \
-  --ground-truth /authorized/UAVDT/GT/M0201_gt.txt \
+  --ground-truth /authorized/UAVDT/GT/M0201_gt_whole.txt \
   --video /authorized/UAVDT/videos/M0201.mp4 \
   --detections /authorized/UAVDT/detections/M0201.csv \
   --ungated /results/M0201_hsv.txt \
