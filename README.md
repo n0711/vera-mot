@@ -339,7 +339,7 @@ The [paired-run audit](docs/REID_PAIRED_ABLATION_AUDIT.md) checks consistency
 of offline pinned BoT-SORT ungated HSV-ReID and gated VERA-ReID outputs. The
 [annotated-validation preflight](docs/REID_ANNOTATED_PREFLIGHT.md) further checks
 the actual local video/detection bytes against recorded SHA-256 values and
-validates original 9-column UAVDT ground truth against the frozen ReID
+validates original 9-column UAVDT *_gt_whole.txt ground truth against the frozen ReID
 validation split and sequence inventory. Neither stage reports identity
 accuracy or modifies the no-ReID benchmark. A real vehicle validation run and
 verified GT-to-TrackEval conversion remain blocked on authorized original
