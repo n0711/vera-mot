@@ -63,7 +63,7 @@ jobs:
       - name: Real tracker and VERA quality-gate integration tests
         run: python -m pytest -v -m integration tests/test_botsort_reid_bridge.py tests/test_vera_reid_quality_gate.py tests/test_vera_reid_video_integration.py
 
-trackeval-converted-gt-smoke:
+  trackeval-converted-gt-smoke:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
