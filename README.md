@@ -22,6 +22,7 @@ memory in UAV video.
 | ByteTrack comparator and identity-annotated ablations | not implemented; gated appearance memory has synthetic integration tests only |
 | Read-only ReID paired integrity audit (M4.7) | merged, verified with synthetic CPU/pinned-tracker CI |
 | Validation source/annotation preflight (M4.8) | implementation with synthetic CPU tests; real annotated validation blocked on source files |
+| UAVDT nine-column GT to pinned TrackEval conversion (M4.9) | CPU converter and synthetic parser check; actual identity metrics still blocked |
 | ROS 2 or edge deployment | not implemented |
 
 The frozen 20-sequence no-ReID result is HOTA 43.340, DetA 36.441, AssA 52.419,
@@ -214,6 +215,24 @@ neither a reliability score nor gating thresholds. See the
 [crop-quality protocol](docs/reid_crop_quality_protocol.md) and
 [evaluation workflow](docs/reid_evaluation_workflow.md).
 
+
+
+## M4.9 - Original UAVDT GT to pinned TrackEval format
+
+The [M4.9 conversion protocol](docs/UAVDT_GT_TRACKEVAL_CONVERSION.md)
+separates original nine-column UAVDT source *_gt_whole.txt files from
+ten-column TrackEval-compatible single-vehicle GT. It preserves original
+geometry and identity numbers, verifies the fixed ReID validation split,
+rejects unknown attribute codes, records aggregate source provenance, and
+makes the single-vehicle class-1 API alias explicit. The pinned TrackEval
+parser is tested with an independent synthetic fixture in CI.
+
+This is a file-format and parser-integration milestone, not validation
+that VERA reduces identity switches. Original authorized annotations,
+trained checkpoint evidence, a verified ignore-area policy and real
+held-out identity experiments remain unavailable. The historical frozen
+no-ReID benchmark is untouched.
+
 ## Data and weights
 
 Place the UAVDT detection subset as:
@@ -339,7 +358,7 @@ The [paired-run audit](docs/REID_PAIRED_ABLATION_AUDIT.md) checks consistency
 of offline pinned BoT-SORT ungated HSV-ReID and gated VERA-ReID outputs. The
 [annotated-validation preflight](docs/REID_ANNOTATED_PREFLIGHT.md) further checks
 the actual local video/detection bytes against recorded SHA-256 values and
-validates original 9-column UAVDT ground truth against the frozen ReID
+validates original 9-column UAVDT *_gt_whole.txt ground truth against the frozen ReID
 validation split and sequence inventory. Neither stage reports identity
 accuracy or modifies the no-ReID benchmark. A real vehicle validation run and
 verified GT-to-TrackEval conversion remain blocked on authorized original

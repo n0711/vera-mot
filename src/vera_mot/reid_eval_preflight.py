@@ -173,8 +173,8 @@ def build_preflight(
     ground_truth = Path(ground_truth)
     ungated, gated = Path(ungated), Path(gated)
     video, detections = Path(video), Path(detections)
-    if ground_truth.name != f"{sequence}_gt.txt":
-        raise AuditError("ground-truth filename must match the declared sequence")
+    if ground_truth.name != f"{sequence}_gt_whole.txt":
+        raise AuditError("original *_gt_whole.txt filename must match the declared sequence")
     paired = audit_pair(ungated, gated)
     shared = paired["shared_inputs"]
     if shared["frame_count"] != record["frames"]:
