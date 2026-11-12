@@ -45,7 +45,7 @@ def experiment(tmp_path: Path) -> dict:
     detections = tmp_path / "detections.csv"
     video.write_bytes(b"synthetic-placeholder-source-bytes-not-video")
     detections.write_text("frame,x1,y1,x2,y2,score\n")
-    gt = tmp_path / "M0201_gt.txt"
+    gt = tmp_path / "M0201_gt_whole.txt"
     gt.write_text(GT_ROWS)
 
     def create_run(name: str, gated: bool) -> Path:
@@ -154,7 +154,7 @@ def test_expected_annotation_count_must_match_original_audit(experiment):
 
 
 def test_ground_truth_name_must_match_sequence(experiment):
-    other = experiment["ground_truth"].with_name("M0202_gt.txt")
+    other = experiment["ground_truth"].with_name("M0202_gt_whole.txt")
     other.write_text(GT_ROWS)
     experiment["ground_truth"] = other
     with pytest.raises(AuditError, match="filename"):
