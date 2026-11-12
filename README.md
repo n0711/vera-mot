@@ -22,6 +22,7 @@ memory in UAV video.
 | ByteTrack comparator and identity-annotated ablations | not implemented; gated appearance memory has synthetic integration tests only |
 | Read-only ReID paired integrity audit (M4.7) | merged, verified with synthetic CPU/pinned-tracker CI |
 | Validation source/annotation preflight (M4.8) | implementation with synthetic CPU tests; real annotated validation blocked on source files |
+| UAVDT nine-column GT to pinned TrackEval conversion (M4.9) | CPU converter and synthetic parser check; actual identity metrics still blocked |
 | ROS 2 or edge deployment | not implemented |
 
 The frozen 20-sequence no-ReID result is HOTA 43.340, DetA 36.441, AssA 52.419,
@@ -213,6 +214,24 @@ neither a reliability score nor gating thresholds. See the
 [temporal protocol](docs/reid_temporal_evaluation_protocol.md),
 [crop-quality protocol](docs/reid_crop_quality_protocol.md) and
 [evaluation workflow](docs/reid_evaluation_workflow.md).
+
+
+
+## M4.9 - Original UAVDT GT to pinned TrackEval format
+
+The [M4.9 conversion protocol](docs/UAVDT_GT_TRACKEVAL_CONVERSION.md)
+separates original nine-column UAVDT source *_gt_whole.txt files from
+ten-column TrackEval-compatible single-vehicle GT. It preserves original
+geometry and identity numbers, verifies the fixed ReID validation split,
+rejects unknown attribute codes, records aggregate source provenance, and
+makes the single-vehicle class-1 API alias explicit. The pinned TrackEval
+parser is tested with an independent synthetic fixture in CI.
+
+This is a file-format and parser-integration milestone, not validation
+that VERA reduces identity switches. Original authorized annotations,
+trained checkpoint evidence, a verified ignore-area policy and real
+held-out identity experiments remain unavailable. The historical frozen
+no-ReID benchmark is untouched.
 
 ## Data and weights
 
