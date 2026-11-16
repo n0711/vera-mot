@@ -79,7 +79,21 @@ Run the exact pinned TrackEval parser smoke test (synthetic GT and tracker):
     git submodule update --init baselines/TrackEval
     python -m pytest -q -m integration tests/test_uavdt_trackeval_parser.py
 
-GitHub CI performs this separate pinned parser check.
+The same CI job scores three synthetic four-frame tracks using the pinned
+HOTA, Identity and CLEAR implementations. The GT has one identity throughout.
+Every reported box matches the GT exactly. CLEAR and Identity use IoU 0.5.
+HOTA and AssA are checked at every threshold from 0.05 to 0.95.
+
+| Tracker observations | HOTA | AssA | IDF1 | ID switches |
+| --- | ---: | ---: | ---: | ---: |
+| One ID throughout | 1 | 1 | 1 | 0 |
+| New ID after frame 2 | √0.5 | 1/2 | 1/2 | 1 |
+| Same ID, frame 2 missing | 3/4 | 3/4 | 6/7 | 0 |
+
+For the switch, each tracker identity covers half the GT track and all four
+detections match. For the miss, detection and association accuracy are both
+3/4. Three identity true positives and one false negative give IDF1 = 6/7.
+These fractions are regression expectations for fabricated tracks.
 
 ## Outstanding research gates
 
