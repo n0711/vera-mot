@@ -108,3 +108,35 @@ These fractions are regression expectations for fabricated tracks.
   provide tracking performance evidence.
 
 The historical 20-sequence frozen no-ReID baseline is unchanged.
+
+## Structural comparison with a reference export
+
+Run this read-only check on an authorized toolkit export in ten-column MOT
+format with mark 1 and class 1, after the source inventory and split gates pass:
+
+    python scripts/compare_uavdt_gt.py \
+      --sequence M0201 \
+      --source /authorized/UAVDT/GT/M0201_gt_whole.txt \
+      --reference /authorized/toolkit/GT/M0201_gt.txt \
+      --ignore-regions /authorized/toolkit/GT/M0201_gt_ignore.txt
+
+The command emits JSON on stdout and writes no files. Exit 0 means all
+frame/identity keys and exact numeric xywh boxes match. Exit 1 reports structural
+differences, with counts of missing reference rows, extra reference rows and
+changed boxes. Exit 2 indicates invalid inputs. Duplicate keys, fractional
+frame/identity indices, invalid dimensions, nonfinite values and unsupported
+mark/class values are rejected. An empty reference reports all source rows
+missing. Numeric formatting and row ordering do not affect the comparison.
+The last two numeric metadata fields are excluded from comparison.
+
+The report includes conversion provenance and a hash of the reference bytes
+used in the comparison. The optional ignore file is fingerprinted as opaque
+bytes. Its presence does not validate its contents or apply ignore filtering.
+A structural match leaves source authenticity, code semantics, retention
+decisions, ignore-region equivalence and annotation-to-video alignment open.
+A source observation omitted by the toolkit is reported as missing, even if
+later independent review establishes a valid exclusion reason.
+
+Synthetic comparison and CLI tests run with:
+
+    python -m pytest -q tests/test_uavdt_gt_compare.py
