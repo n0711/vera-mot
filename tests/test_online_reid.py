@@ -117,12 +117,16 @@ def test_end_to_end_synthetic_video_and_detection_csv(tmp_path):
                    "3,12,10,32,30,0.9\n"
                    "4,13,10,33,30,0.9\n", encoding="utf-8")
     summary = module.run(video, csv, output, embedder=HSVHistogramEmbedder(),
-                         min_similarity=.7, max_age=5)
+                         min_similarity=.7, max_age=5, recovery_margin=.05)
     ids = [int(line.split(',')[1]) for line in output.read_text().splitlines()]
     assert ids == [1, 1, 1]
     assert summary["scope"] == "appearance_association_without_ground_truth"
     assert summary["observations"] == 3
     assert summary["matched_existing"] == 2
+    assert summary["gap_recoveries"] == 1
+    assert summary["gap_recovery_events"] == [
+        {"frame": 3, "track_id": 1, "missed_frames": 1}]
+    assert summary["association_parameters"]["recovery_margin"] == .05
     assert len(output.read_text().splitlines()) == 3
 
 
@@ -157,3 +161,75 @@ def test_complete_generated_demo_preserves_two_ids_after_gap(tmp_path):
         values = row.split(",")
         tracks.setdefault(int(values[1]), []).append(int(values[0]))
     assert sorted(tracks.values(), key=len) == [[1, 2, 3, 6, 7, 8], list(range(1, 9))]
+
+
+@pytest.mark.parametrize("margin", [-.1, 1.1, float("nan"), float("inf")])
+def test_recovery_margin_validation(margin):
+    with pytest.raises(ValueError, match="recovery_margin"):
+        OnlineReID(recovery_margin=margin)
+
+
+def test_gap_metadata_and_expiry_boundary():
+    tracker = OnlineReID(max_age=3, recovery_margin=.05)
+    assert _update(tracker, 1, [[0, 0, 10, 10]], [[1, 0]])[0].missed_frames == 0
+    recovered = _update(tracker, 4, [[5, 0, 15, 10]], [[1, 0]])[0]
+    assert (recovered.track_id, recovered.missed_frames) == (1, 2)
+    continued = _update(tracker, 5, [[6, 0, 16, 10]], [[1, 0]])[0]
+    assert continued.matched_existing and continued.missed_frames == 0
+    expired = _update(tracker, 9, [[6, 0, 16, 10]], [[1, 0]])[0]
+    assert not expired.matched_existing and expired.missed_frames == 0
+
+
+@pytest.mark.parametrize("reverse", [False, True])
+def test_similar_lost_ids_are_not_arbitrarily_recovered(reverse):
+    tracker = OnlineReID(recovery_margin=.05)
+    boxes = [[0, 0, 10, 10], [20, 0, 30, 10]]
+    _update(tracker, 1, boxes[::-1] if reverse else boxes, [[1, 0], [1, 0]])
+    result = _update(tracker, 3, [[10, 0, 20, 10]], [[1, 0]])
+    assert result[0].track_id == 3 and not result[0].matched_existing
+    # Refusing recovery must not overwrite or refresh the old identity memory.
+    assert tracker.active_ids == (1, 2, 3)
+    assert tracker._tracks[1].last_frame == tracker._tracks[2].last_frame == 1
+
+
+@pytest.mark.parametrize("reverse", [False, True])
+def test_one_lost_id_with_two_equal_detections_is_not_reused(reverse):
+    tracker = OnlineReID(recovery_margin=.05)
+    _update(tracker, 1, [[10, 0, 20, 10]], [[1, 0]])
+    boxes = [[0, 0, 10, 10], [20, 0, 30, 10]]
+    result = _update(tracker, 3, boxes[::-1] if reverse else boxes, [[1, 0], [1, 0]])
+    assert all(not x.matched_existing for x in result)
+    assert len({x.track_id for x in result}) == 2
+
+
+def test_distinct_vehicles_recover_after_gap_in_swapped_order():
+    tracker = OnlineReID(recovery_margin=.05)
+    _update(tracker, 1, [[0, 0, 10, 10], [20, 0, 30, 10]], [[1, 0], [0, 1]])
+    result = _update(tracker, 4, [[0, 0, 10, 10], [20, 0, 30, 10]], [[0, 1], [1, 0]])
+    assert [x.track_id for x in result] == [2, 1]
+    assert [x.missed_frames for x in result] == [2, 2]
+
+
+def test_zero_margin_reproduces_baseline_and_guard_leaves_continuity_alone():
+    for margin, frame in [(0, 3), (.05, 2)]:
+        tracker = OnlineReID(recovery_margin=margin)
+        _update(tracker, 1, [[0, 0, 10, 10], [20, 0, 30, 10]], [[1, 0], [1, 0]])
+        result = _update(tracker, frame, [[10, 0, 20, 10]], [[1, 0]])
+        assert result[0].matched_existing
+
+
+def test_active_identity_competes_with_lost_identity_for_recovery():
+    tracker = OnlineReID(recovery_margin=.05)
+    _update(tracker, 1, [[0, 0, 10, 10], [20, 0, 30, 10]], [[1, 0], [1, 0]])
+    assert _update(tracker, 2, [[20, 0, 30, 10]], [[1, 0]])[0].track_id == 2
+    result = _update(tracker, 3, [[10, 0, 20, 10]], [[1, 0]])
+    assert result[0].track_id == 2 and result[0].missed_frames == 0
+
+
+@pytest.mark.parametrize("margin, expected_id", [(.06, 1), (.07, 3)])
+def test_recovery_requires_configured_advantage_not_just_unique_best(margin, expected_id):
+    tracker = OnlineReID(recovery_margin=margin)
+    _update(tracker, 1, [[0, 0, 10, 10], [20, 0, 30, 10]], [[1, 0], [1, 0]])
+    # Costs: .15 * (1 - 6/14) and .15; advantage is approximately .064286.
+    result = _update(tracker, 3, [[4, 0, 14, 10]], [[1, 0]])
+    assert result[0].track_id == expected_id
