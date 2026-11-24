@@ -58,18 +58,21 @@ def read_detections(path: Path) -> dict[int, np.ndarray]:
 
 
 def run(video: Path, detections: Path, output: Path, *,
-        embedder, min_similarity: float, max_age: int, annotate: Path | None = None) -> dict:
+        embedder, min_similarity: float, max_age: int, annotate: Path | None = None,
+        recovery_margin: float = 0.0) -> dict:
+    tracker = OnlineReID(min_similarity=min_similarity, max_age=max_age,
+                         recovery_margin=recovery_margin)
     if not video.is_file():
         raise FileNotFoundError(f"video missing: {video}")
     frames_to_boxes = read_detections(detections)
     capture = cv2.VideoCapture(str(video))
     if not capture.isOpened():
         raise ValueError(f"cannot open video: {video}")
-    tracker = OnlineReID(min_similarity=min_similarity, max_age=max_age)
     lines = []
     frame_id = 0
     observed = 0
     reassociated = 0
+    recoveries = []
     writer = None
     try:
         if annotate is not None:
@@ -100,6 +103,9 @@ def run(video: Path, detections: Path, output: Path, *,
                              f"{x2-x1:.2f},{y2-y1:.2f},{a.score:.4f},-1,-1,-1\n")
                 observed += 1
                 reassociated += int(a.matched_existing)
+                if a.missed_frames:
+                    recoveries.append({"frame": frame_id, "track_id": a.track_id,
+                                       "missed_frames": a.missed_frames})
                 if writer is not None:
                     p1, p2 = (int(x1), int(y1)), (int(x2), int(y2))
                     cv2.rectangle(frame, p1, p2, (0, 255, 0), 2)
@@ -120,6 +126,11 @@ def run(video: Path, detections: Path, output: Path, *,
     return {"scope": "appearance_association_without_ground_truth",
             "frame_count": frame_id, "observations": observed,
             "matched_existing": reassociated,
+            "gap_recoveries": len(recoveries),
+            "gap_recovery_events": recoveries,
+            "association_parameters": {"min_similarity": min_similarity,
+                                       "max_age": max_age,
+                                       "recovery_margin": recovery_margin},
             "unique_ids": len(set(int(row.split(",")[1]) for row in lines)),
             "embedding_method": embedder.name,
             "weight_sha256": getattr(embedder, "weights_sha256", None),
@@ -139,6 +150,8 @@ def main() -> int:
     p.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
     p.add_argument("--min-similarity", type=float, default=0.75)
     p.add_argument("--max-age", type=int, default=30)
+    p.add_argument("--recovery-margin", type=float, default=0.0,
+                   help="Minimum cost advantage for gap recovery; 0 disables the guard")
     args = p.parse_args()
     if args.embedding == "hsv":
         if args.weights is not None or args.weights_sha256 is not None:
@@ -150,7 +163,7 @@ def main() -> int:
         embedder = ResNet18Embedder(args.weights, args.device, args.weights_sha256)
     summary = run(args.video, args.detections, args.output, embedder=embedder,
                   min_similarity=args.min_similarity, max_age=args.max_age,
-                  annotate=args.annotate)
+                  annotate=args.annotate, recovery_margin=args.recovery_margin)
     (args.output.with_suffix(".provenance.json")).write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2, sort_keys=True))

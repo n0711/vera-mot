@@ -19,6 +19,7 @@ class AssignedDetection:
     bbox: tuple[float, float, float, float]  # xyxy
     score: float
     matched_existing: bool
+    missed_frames: int = 0  # preceding gap for a reused ID; zero for new IDs
 
 
 @dataclass
@@ -65,11 +66,13 @@ class OnlineReID:
         max_displacement: float = 5.0,
         min_score: float = 0.25,
         feature_momentum: float = 0.9,
+        recovery_margin: float = 0.0,
     ) -> None:
         for name, value in (
             ("min_similarity", min_similarity), ("max_cost", max_cost),
             ("appearance_weight", appearance_weight), ("min_score", min_score),
             ("feature_momentum", feature_momentum),
+            ("recovery_margin", recovery_margin),
         ):
             if not np.isfinite(value) or not 0 <= value <= 1:
                 raise ValueError(f"{name} must be between 0 and 1")
@@ -84,6 +87,7 @@ class OnlineReID:
         self.max_displacement = max_displacement
         self.min_score = min_score
         self.feature_momentum = feature_momentum
+        self.recovery_margin = recovery_margin
         self._tracks: dict[int, _Track] = {}
         self._next_id = 1
         self._frame = 0
@@ -153,6 +157,25 @@ class OnlineReID:
                 ) * (1 - _iou(track.bbox, box))
                 if cost <= self.max_cost:
                     costs[i, j] = cost
+        # Check against the original feasible candidates, before assignment or
+        # pruning. A lost track needs a unique preference in both directions:
+        # over other detections, and over other retained (including active) IDs.
+        # Zero disables this optional policy for baseline reproduction.
+        if self.recovery_margin > 0 and costs.size:
+            original_costs = costs.copy()
+            for i, track in enumerate(existing):
+                if frame - track.last_frame <= 1:
+                    continue
+                for j in range(len(accepted)):
+                    cost = original_costs[i, j]
+                    if cost >= 1e6:
+                        continue
+                    alternatives = np.concatenate((
+                        np.delete(original_costs[i, :], j),
+                        np.delete(original_costs[:, j], i),
+                    ))
+                    if np.any(alternatives - cost < self.recovery_margin):
+                        costs[i, j] = 1e6
         matches: dict[int, int] = {}
         if costs.size:
             rows, cols = linear_sum_assignment(costs)
@@ -164,9 +187,11 @@ class OnlineReID:
             box = boxes[original_index].copy()
             feature = features[j].copy()
             matched = j in matches
+            missed_frames = 0
             if matched:
                 track_id = matches[j]
                 old = self._tracks[track_id]
+                missed_frames = frame - old.last_frame - 1
                 smoothed = self.feature_momentum * old.feature + (
                     1 - self.feature_momentum
                 ) * feature
@@ -178,5 +203,5 @@ class OnlineReID:
                 self._next_id += 1
             self._tracks[track_id] = _Track(track_id, box, feature, frame)
             result.append(AssignedDetection(track_id, tuple(float(v) for v in box),
-                                            float(scores[original_index]), matched))
+                                            float(scores[original_index]), matched, missed_frames))
         return result
